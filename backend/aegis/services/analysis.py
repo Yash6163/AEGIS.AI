@@ -1,4 +1,9 @@
-"""Upload analysis jobs: flow CSV -> per-host windows -> forecasts -> alerts."""
+"""Upload analysis jobs: flow CSV or PCAP -> per-host windows -> forecasts -> alerts.
+
+The input format is detected (CICFlowMeter, Argus/CTU-13 binetflow, UNSW-NB15,
+libpcap) and routed to the model whose features it can supply: CICFlowMeter
+files use the CIC-IDS2017 model (37 features); everything else uses the
+multi-dataset portable model (26 features)."""
 
 from __future__ import annotations
 
@@ -22,11 +27,13 @@ from ..forecasting.features import (
     entity_raw_stats,
     entity_window_features,
     entity_window_states,
-    normalise_flows,
     parse_networks,
+    portable_window_features,
+    window_states_from,
 )
-from ..forecasting.states import STATE_NAMES
-from ..ingestion.upload import StoredUpload, UploadError, read_flow_csv
+from ..forecasting.states import STATE_NAMES, UNSW_NB15_LABEL_MAP, map_ctu13_label, normalise_label
+from ..ingestion.formats import to_canonical
+from ..ingestion.upload import PCAP_SUFFIXES, StoredUpload, UploadError, read_flow_csv, read_pcap
 from . import alerts as alert_svc
 from . import audit
 from .registry import get_registry
@@ -67,6 +74,20 @@ def sliding_histories(features: np.ndarray, history: int) -> np.ndarray:
     return padded[idx]
 
 
+def _label_states(ef, profile: str):
+    """Window states from the file's own labels (display/evaluation only)."""
+    if profile == "cic":
+        return entity_window_states(ef, 60, 2)["state"]
+    if profile == "binetflow":
+        return window_states_from(ef.assign(state=ef["label"].map(lambda x: int(map_ctu13_label(x)))), "state", 60, 2)["state"]
+    if profile == "unsw":
+        mapped = ef["label"].map(lambda x: UNSW_NB15_LABEL_MAP.get(normalise_label(x) or "normal"))
+        if mapped.isna().any():
+            raise ValueError("unknown UNSW-NB15 attack categories")
+        return window_states_from(ef.assign(state=mapped.astype(int)), "state", 60, 2)["state"]
+    raise ValueError(f"no label mapping for {profile}")
+
+
 def run_job(job_id: str, stored: StoredUpload, suffix: str, settings: Settings) -> None:
     t0 = time.perf_counter()
     reg = get_registry()
@@ -74,14 +95,22 @@ def run_job(job_id: str, stored: StoredUpload, suffix: str, settings: Settings) 
         with session_scope() as db:
             job = db.get(AnalysisJob, job_id)
             job.status = "running"
-        engine = reg.production
-        if engine is None:
-            raise RuntimeError("model not loaded")
-        raw = read_flow_csv(stored, suffix, settings.max_uncompressed_mb << 20, settings.max_upload_rows)
-        flows, warnings = normalise_flows(raw)
-        del raw
-        if flows.empty:
-            raise UploadError("no usable flow rows after validation")
+        if suffix in PCAP_SUFFIXES:
+            flows, pstats = read_pcap(stored, suffix, settings.max_upload_rows * 10)
+            profile = "pcap"
+            warnings = [f"PCAP: {pstats['packets']:,} packets -> {pstats['flows']:,} bidirectional flows "
+                        f"({pstats['skipped']:,} non-IPv4 packets skipped)" + (", capture truncated" if pstats["truncated"] else "")]
+            if flows.empty:
+                raise UploadError("no IPv4 TCP/UDP/ICMP packets in the capture")
+            flows["total_pkts"] = flows["fwd_pkts"] + flows["bwd_pkts"]
+        else:
+            raw = read_flow_csv(stored, suffix, settings.max_uncompressed_mb << 20, settings.max_upload_rows)
+            flows, profile, warnings = to_canonical(raw)
+            del raw
+        engine = reg.engine_for_profile("cic" if profile == "cic" else "portable")
+        portable = engine.manifest.get("feature_set") == "portable"
+        warnings.insert(0, f"Detected format: {profile}; model {engine.version} "
+                           f"({'portable 26-feature' if portable else 'CICFlowMeter 37-feature'}).")
         with session_scope() as db:
             networks_spec = db.get(AnalysisJob, job_id).internal_networks
             anonymise = db.get(AnalysisJob, job_id).anonymized
@@ -95,14 +124,14 @@ def run_job(job_id: str, stored: StoredUpload, suffix: str, settings: Settings) 
         ef = ef[ef["entity"].isin(keep)]
         if ef.empty:
             raise UploadError("no internal host has enough flows to analyse")
-        feats = entity_window_features(ef, 60)
+        feats = portable_window_features(ef, 60) if portable else entity_window_features(ef, 60)
         stats = entity_raw_stats(ef, 60)
         has_labels = "label" in ef.columns
         labels = None
         if has_labels:
             try:
-                labels = entity_window_states(ef, 60, int(engine.manifest.get("min_attack_flows", 2)))["state"]
-            except ValueError as exc:
+                labels = _label_states(ef, profile)
+            except (ValueError, KeyError) as exc:
                 warnings.append(f"labels ignored: {exc}")
                 has_labels = False
         if len(feats) > MAX_HOST_WINDOWS:

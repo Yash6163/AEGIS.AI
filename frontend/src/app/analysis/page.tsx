@@ -29,7 +29,7 @@ export default function AnalysisPage() {
 
   const validate = (f: File | null): string | null => {
     if (!f) return "Choose a file first.";
-    if (!/\.(csv|csv\.gz)$/i.test(f.name)) return "Only .csv or .csv.gz CICFlowMeter exports are accepted.";
+    if (!/\.(csv|csv\.gz|binetflow|pcap|pcap\.gz|cap)$/i.test(f.name)) return "Accepted: flow CSV (.csv, .csv.gz, .binetflow) or libpcap capture (.pcap, .pcap.gz).";
     if (f.size > MAX_MB * 1024 * 1024) return `File is larger than ${MAX_MB} MB.`;
     return null;
   };
@@ -59,15 +59,15 @@ export default function AnalysisPage() {
   return (
     <div>
       <PageHeader title="Traffic analysis"
-        description="Upload a CICFlowMeter flow export. Flows are grouped per internal host and per minute, every host-minute is forecast, and alerts are raised where the early-warning condition starts." />
+        description="Upload flow records or a packet capture. Flows are grouped per internal host and per minute, every host-minute is forecast, and alerts are raised where the early-warning condition starts." />
       <div className="grid gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
-        <Card title="Upload flows" subtitle={`.csv or .csv.gz, max ${MAX_MB} MB, CIC-IDS2017 / CICFlowMeter column names. An optional Label column is used only for comparison.`}>
+        <Card title="Upload traffic" subtitle={`Max ${MAX_MB} MB. Format is detected automatically: CICFlowMeter CSV -> CIC model (37 features); Argus/CTU-13 binetflow, UNSW-NB15 CSV or libpcap .pcap -> multi-dataset portable model (26 features). Label columns are used only for comparison.`}>
           <form onSubmit={submit} className="space-y-3">
             <label className="flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-line-strong bg-surface-0 px-4 py-6 text-center hover:border-accent/60">
               <FileUp className="h-6 w-6 text-ink-3" aria-hidden />
-              <span className="text-sm text-ink-1">{file ? file.name : "Choose a flow file"}</span>
+              <span className="text-sm text-ink-1">{file ? file.name : "Choose a flow file or .pcap"}</span>
               <span className="text-xs text-ink-3">{file ? `${(file.size / 1048576).toFixed(1)} MB` : "never executed; parsed as data only"}</span>
-              <input ref={inputRef} type="file" accept=".csv,.gz,text/csv,application/gzip" className="sr-only"
+              <input ref={inputRef} type="file" accept=".csv,.gz,.binetflow,.pcap,.cap,text/csv,application/gzip,application/vnd.tcpdump.pcap" className="sr-only"
                 onChange={(e) => { setFile(e.target.files?.[0] ?? null); setErr(null); }} />
             </label>
             <div>

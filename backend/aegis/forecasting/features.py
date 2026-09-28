@@ -329,11 +329,11 @@ def entity_raw_stats(ef: pd.DataFrame, window_seconds: int = 60) -> pd.DataFrame
     g = ef.groupby(["entity", "w"], sort=True)
     stats = pd.DataFrame({
         "flows": g.size(),
-        "packets": g["fwd_pkts"].sum() + g["bwd_pkts"].sum(),
+        "packets": g["total_pkts"].sum() if "total_pkts" in ef else g["fwd_pkts"].sum() + g["bwd_pkts"].sum(),
         "bytes": g["fwd_bytes"].sum() + g["bwd_bytes"].sum(),
         "unique_peers": ef.assign(peer=np.where(ef["direction"] == 1, ef["dst_ip"], ef["src_ip"])).groupby(["entity", "w"])["peer"].nunique(),
         "unique_dst_ports": g["dst_port"].nunique(),
-        "syn_flags": g["syn"].sum(),
+        "syn_flags": g["syn"].sum() if "syn" in ef else 0,
     })
     stats.index = stats.index.set_names(["entity", "window_start"])
     return _reindex_entities(stats, window_seconds).astype(np.int64)
@@ -360,5 +360,98 @@ def entity_window_states(ef: pd.DataFrame, window_seconds: int = 60, min_attack_
     state = np.where(attack.max(axis=1) >= min_attack_flows, top, int(AttackState.NORMAL))
     out = pd.DataFrame({"state": state.astype(np.int64)}, index=counts.index)
     out[[f"n_{i}" for i in range(NUM_STATES)]] = counts.to_numpy()
+    out.index = out.index.set_names(["entity", "window_start"])
+    return _reindex_entities(out, window_seconds).astype(np.int64)
+
+
+# --------------------------------------------------------------------------
+# Portable feature set: computable from ANY flow record that has timestamp,
+# endpoints, destination port, protocol, duration, total packets and bytes per
+# direction (CICFlowMeter, UNSW-NB15/Argus, CTU-13 binetflow, NetFlow/IPFIX,
+# or flows built from PCAP). Used for multi-dataset training.
+
+PORTABLE_FEATURE_NAMES: list[str] = [
+    "log_flows", "log_total_pkts", "log_fwd_bytes", "log_bwd_bytes", "log_bwd_fwd_byte_ratio",
+    "mean_log_duration", "std_log_duration", "mean_log_bytes_per_pkt", "no_reply_frac", "short_flow_frac",
+    "tcp_frac", "udp_frac", "icmp_frac", "log_uniq_src_ip", "log_uniq_dst_ip", "log_uniq_dst_port",
+    "dst_port_entropy", "src_ip_entropy", "dst_ip_entropy", "top_src_share", "top_dst_share",
+    "log_max_src_port_fanout", "log_max_src_host_fanout", "wellknown_port_frac", "outbound_frac",
+    "external_peer_frac",
+]
+PORTABLE_DESCRIPTIONS: dict[str, str] = {
+    **{k: v for k, v in FEATURE_DESCRIPTIONS.items() if k in PORTABLE_FEATURE_NAMES},
+    "log_total_pkts": "packets (both directions)",
+    "log_bwd_fwd_byte_ratio": "reply/request byte ratio",
+    "mean_log_bytes_per_pkt": "bytes per packet",
+    "no_reply_frac": "share of flows with no reply bytes",
+    "icmp_frac": "share of ICMP flows",
+}
+PORTABLE_REQUIRED = ["timestamp", "src_ip", "dst_ip", "dst_port", "protocol", "duration_us",
+                     "total_pkts", "fwd_bytes", "bwd_bytes"]
+
+
+def portable_window_features(ef: pd.DataFrame, window_seconds: int = 60) -> pd.DataFrame:
+    """Portable feature matrix indexed by (entity, window_start)."""
+    if ef.empty:
+        return pd.DataFrame(columns=PORTABLE_FEATURE_NAMES)
+    f = ef
+    keys = ["entity", "w"]
+    kser = [f[k] for k in keys]
+    g = f.groupby(keys, sort=True)
+    n = g.size().astype(float)
+
+    def s(col):
+        return g[col].sum()
+
+    def m(values):
+        return pd.Series(np.asarray(values, dtype=float), index=f.index).groupby(kser).mean()
+
+    lvl = [0, 1]
+    pk = f["total_pkts"].clip(lower=0)
+    byt = f["fwd_bytes"].clip(lower=0) + f["bwd_bytes"].clip(lower=0)
+    log_dur = pd.Series(np.log1p(f["duration_us"].clip(lower=0)).values, index=f.index)
+    x = pd.DataFrame(index=n.index)
+    x["log_flows"] = np.log1p(n)
+    x["log_total_pkts"] = np.log1p(s("total_pkts").clip(lower=0))
+    x["log_fwd_bytes"] = np.log1p(s("fwd_bytes").clip(lower=0))
+    x["log_bwd_bytes"] = np.log1p(s("bwd_bytes").clip(lower=0))
+    x["log_bwd_fwd_byte_ratio"] = np.log((s("bwd_bytes").clip(lower=0) + 1) / (s("fwd_bytes").clip(lower=0) + 1))
+    x["mean_log_duration"] = log_dur.groupby(kser).mean()
+    x["std_log_duration"] = log_dur.groupby(kser).std(ddof=0)
+    x["mean_log_bytes_per_pkt"] = m(np.log1p(byt / pk.where(pk > 0, 1)))
+    x["no_reply_frac"] = m(f["bwd_bytes"] <= 0)
+    x["short_flow_frac"] = m(f["duration_us"] < 1000)
+    x["tcp_frac"] = m(f["protocol"] == 6)
+    x["udp_frac"] = m(f["protocol"] == 17)
+    x["icmp_frac"] = m(f["protocol"] == 1)
+    x["log_uniq_src_ip"] = np.log1p(g["src_ip"].nunique())
+    x["log_uniq_dst_ip"] = np.log1p(g["dst_ip"].nunique())
+    x["log_uniq_dst_port"] = np.log1p(g["dst_port"].nunique())
+    x["dst_port_entropy"] = _entropy(kser, f["dst_port"])
+    x["src_ip_entropy"] = _entropy(kser, f["src_ip"])
+    x["dst_ip_entropy"] = _entropy(kser, f["dst_ip"])
+    x["top_src_share"] = f.groupby([*keys, "src_ip"]).size().groupby(level=lvl).max() / n
+    x["top_dst_share"] = f.groupby([*keys, "dst_ip"]).size().groupby(level=lvl).max() / n
+    x["log_max_src_port_fanout"] = np.log1p(f.groupby([*keys, "src_ip"])["dst_port"].nunique().groupby(level=lvl).max())
+    x["log_max_src_host_fanout"] = np.log1p(f.groupby([*keys, "src_ip"])["dst_ip"].nunique().groupby(level=lvl).max())
+    x["wellknown_port_frac"] = m(f["dst_port"] < 1024)
+    x["outbound_frac"] = m(f["direction"] == 1)
+    x["external_peer_frac"] = m(~f["peer_internal"].astype(bool))
+    x.index = x.index.set_names(["entity", "window_start"])
+    return _reindex_entities(x[PORTABLE_FEATURE_NAMES], window_seconds).astype(np.float32)
+
+
+def window_states_from(ef: pd.DataFrame, state_col: str = "state", window_seconds: int = 60,
+                       min_attack_flows: int = 2) -> pd.DataFrame:
+    """Like entity_window_states, but from an integer per-flow state column."""
+    counts = (
+        pd.DataFrame({"entity": ef["entity"], "w": ef["w"], "s": ef[state_col].astype(int)})
+        .groupby(["entity", "w", "s"]).size().unstack(fill_value=0)
+        .reindex(columns=range(NUM_STATES), fill_value=0)
+    )
+    attack = counts.drop(columns=[int(AttackState.NORMAL)])
+    top = attack.idxmax(axis=1)
+    state = np.where(attack.max(axis=1) >= min_attack_flows, top, int(AttackState.NORMAL))
+    out = pd.DataFrame({"state": state.astype(np.int64)}, index=counts.index)
     out.index = out.index.set_names(["entity", "window_start"])
     return _reindex_entities(out, window_seconds).astype(np.int64)

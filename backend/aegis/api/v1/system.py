@@ -27,6 +27,7 @@ def ready(reg: Registry = Depends(registry_dep), settings: Settings = Depends(se
         "database": ping(),
         "scenarios": reg.scenarios is not None,
         "cv_models": len(reg.cv_folds),
+        "portable_model": reg.portable is not None,
     }
     ok = checks["model"] and checks["database"]
     body = {
@@ -73,3 +74,10 @@ def model_metrics(reg: Registry = Depends(ready_registry)) -> dict:
     if reg.metrics is None:
         raise HTTPException(404, "metrics.json not found for this model; run ml/evaluate.py")
     return reg.metrics
+
+
+@router.get("/model/metrics/multi", summary="Multi-dataset evaluation (CIC-IDS2017, UNSW-NB15, CTU-13, DARPA 2000, CIC-IDS2018)")
+def model_metrics_multi(reg: Registry = Depends(registry_dep)) -> dict:
+    if reg.metrics_multi is None:
+        raise HTTPException(404, "metrics_multi.json not found; run ml/evaluate_multi.py")
+    return {**reg.metrics_multi, "portable_model": reg.portable.version if reg.portable else None}

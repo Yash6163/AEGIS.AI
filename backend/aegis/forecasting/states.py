@@ -112,3 +112,62 @@ def normalise_label(label: str) -> str:
 def map_label(label: str) -> AttackState | None:
     """Map a dataset label to a state; None if the label is unknown."""
     return CICIDS2017_LABEL_MAP.get(normalise_label(label))
+
+
+# --------------------------------------------------------------------------
+# Additional datasets (multi-dataset training / evaluation). Mappings are
+# documented with their caveats in docs/STATE_MAPPING.md.
+
+# UNSW-NB15 `attack_cat` (normalised) -> state
+UNSW_NB15_LABEL_MAP: dict[str, AttackState] = {
+    "normal": AttackState.NORMAL,
+    "reconnaissance": AttackState.RECONNAISSANCE,
+    "analysis": AttackState.RECONNAISSANCE,        # port scans, spam, HTML file penetration probes
+    "fuzzers": AttackState.RECONNAISSANCE,         # vulnerability probing with malformed input
+    "generic": AttackState.CREDENTIAL_ACCESS,      # cipher-agnostic attacks on crypto (ambiguous category)
+    "exploits": AttackState.EXPLOITATION,
+    "shellcode": AttackState.EXPLOITATION,
+    "backdoor": AttackState.COMMAND_AND_CONTROL,
+    "backdoors": AttackState.COMMAND_AND_CONTROL,
+    "worms": AttackState.INFILTRATION,             # self-propagating compromise
+    "dos": AttackState.IMPACT,
+}
+
+# CSE-CIC-IDS2018 labels on the days that keep host IPs
+CICIDS2018_LABEL_MAP: dict[str, AttackState] = {
+    "benign": AttackState.NORMAL,
+    "ddos attacks loic http": AttackState.IMPACT,
+    "ddos attack loic udp": AttackState.IMPACT,
+    "ddos loic udp": AttackState.IMPACT,
+    "ddos attacks-loic-http": AttackState.IMPACT,
+    "ddos attack-loic-udp": AttackState.IMPACT,
+}
+
+# DARPA 2000 LLDOS 1.0 attack phases -> state
+DARPA2000_PHASE_MAP: dict[int, AttackState] = {
+    1: AttackState.RECONNAISSANCE,   # IP sweep
+    2: AttackState.RECONNAISSANCE,   # sadmind probe of live hosts
+    3: AttackState.EXPLOITATION,     # sadmind buffer-overflow break-in
+    4: AttackState.INFILTRATION,     # mstream DDoS trojan installed on compromised hosts
+    5: AttackState.IMPACT,           # DDoS launched
+}
+
+
+def map_ctu13_label(label: str) -> AttackState:
+    """CTU-13 binetflow label -> state (bot host perspective).
+
+    From-Botnet flows: C&C channels -> COMMAND_AND_CONTROL; ICMP floods (DDoS
+    scenarios), spam and click-fraud -> IMPACT (resource hijacking); failed
+    connection attempts -> RECONNAISSANCE (scanning); other bot traffic runs
+    under C2 -> COMMAND_AND_CONTROL. Background and From-Normal -> NORMAL.
+    """
+    s = str(label)
+    if "From-Botnet" not in s:
+        return AttackState.NORMAL
+    if "-CC" in s:
+        return AttackState.COMMAND_AND_CONTROL
+    if "ICMP" in s or "SPAM" in s or "-Ad-" in s:
+        return AttackState.IMPACT
+    if "Attempt" in s:
+        return AttackState.RECONNAISSANCE
+    return AttackState.COMMAND_AND_CONTROL

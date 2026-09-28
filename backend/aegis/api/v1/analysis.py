@@ -24,7 +24,7 @@ router = APIRouter(prefix="/analysis", tags=["analysis"])
 
 @router.post("/upload", status_code=status.HTTP_202_ACCEPTED, response_model=JobOut,
              dependencies=[Depends(require_api_key)],
-             summary="Upload a CICFlowMeter flow CSV (.csv / .csv.gz) for forecasting")
+             summary="Upload flows (CICFlowMeter / binetflow / UNSW-NB15 CSV) or a libpcap capture for forecasting")
 def upload(
     file: UploadFile = File(...),
     internal_networks: str = Form("192.168.0.0/16,10.0.0.0/8,172.16.0.0/12", max_length=500),
@@ -108,9 +108,10 @@ def job_forecast(job_id: str, host: str = Query(max_length=64), minute: int = Qu
         raise HTTPException(404, "host not found in job")
     if minute >= len(rows):
         raise HTTPException(422, f"minute must be < {len(rows)}")
-    L = reg.production.rt.history
+    engine = reg.by_version(job.model_version) or reg.production
+    L = engine.rt.history
     hist = np.asarray([r.features for r in rows[max(0, minute - L + 1):minute + 1]], dtype=np.float64)
-    fc = reg.production.forecast(hist, horizon=horizon, n_samples=settings.mc_samples, seed=minute)
+    fc = engine.forecast(hist, horizon=horizon, n_samples=settings.mc_samples, seed=minute)
     fut = rows[minute:minute + horizon + 1]
     fc["context"] = {"source": "upload", "job_id": job_id, "host": host, "minute": minute,
                      "window_start": rows[minute].window_start.isoformat()}

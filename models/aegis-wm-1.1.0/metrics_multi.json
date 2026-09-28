@@ -1,0 +1,2065 @@
+{
+ "E1_single": {
+  "cic2017": {
+   "states": {
+    "1": {
+     "macro_f1": 0.26649107066215366,
+     "accuracy": 0.9861466513720992
+    },
+    "5": {
+     "macro_f1": 0.24674257783855694,
+     "accuracy": 0.9843905129619416
+    }
+   },
+   "early_warning": {
+    "n": 18130,
+    "positives": 464,
+    "auroc": 0.872773338226166,
+    "auprc": 0.4348647171722775,
+    "precision": 0.673469387755102,
+    "recall": 0.28448275862068967,
+    "f05": 0.5288461538461539,
+    "f1": 0.4,
+    "false_alarm_rate": 0.003622778218045964
+   },
+   "n_samples": 23800
+  },
+  "unsw": {
+   "states": {
+    "1": {
+     "macro_f1": 0.5555656422596145,
+     "accuracy": 0.9210929519918284
+    },
+    "5": {
+     "macro_f1": 0.49630311793912985,
+     "accuracy": 0.9109651523444627
+    }
+   },
+   "early_warning": {
+    "n": 21924,
+    "positives": 4457,
+    "auroc": 0.996672927348021,
+    "auprc": 0.9899095164619887,
+    "precision": 0.997709049255441,
+    "recall": 0.9771146511106125,
+    "f05": 0.993521011087284,
+    "f1": 0.9873044661074586,
+    "false_alarm_rate": 0.000572508158241255
+   },
+   "n_samples": 28784
+  },
+  "ctu13": {
+   "states": {
+    "1": {
+     "macro_f1": 0.4572235519314486,
+     "accuracy": 0.9937988116551205
+    },
+    "5": {
+     "macro_f1": 0.3824010828936283,
+     "accuracy": 0.9870683996324012
+    }
+   },
+   "early_warning": {
+    "n": 30468,
+    "positives": 626,
+    "auroc": 0.8427450868503832,
+    "auprc": 0.40918830387280125,
+    "precision": 0.5707196029776674,
+    "recall": 0.36741214057507987,
+    "f05": 0.5138516532618409,
+    "f1": 0.44703595724003886,
+    "false_alarm_rate": 0.005797198579183701
+   },
+   "n_samples": 40618
+  }
+ },
+ "E2_joint": {
+  "cic2017": {
+   "states": {
+    "1": {
+     "macro_f1": 0.3164993643011182,
+     "accuracy": 0.985926056648725
+    },
+    "5": {
+     "macro_f1": 0.3034497795324594,
+     "accuracy": 0.9845559845559846
+    }
+   },
+   "early_warning": {
+    "n": 18130,
+    "positives": 464,
+    "auroc": 0.8000391361547801,
+    "auprc": 0.36944976530322793,
+    "precision": 0.8066666666666666,
+    "recall": 0.2607758620689655,
+    "f05": 0.5686090225563909,
+    "f1": 0.3941368078175896,
+    "false_alarm_rate": 0.0016415713800520774
+   },
+   "n_samples": 23800
+  },
+  "unsw": {
+   "states": {
+    "1": {
+     "macro_f1": 0.5519326192088622,
+     "accuracy": 0.9218590398365679
+    },
+    "5": {
+     "macro_f1": 0.5094097948084463,
+     "accuracy": 0.9130633096150338
+    }
+   },
+   "early_warning": {
+    "n": 21924,
+    "positives": 4457,
+    "auroc": 0.9982087700773967,
+    "auprc": 0.9909162660805427,
+    "precision": 0.9976894639556377,
+    "recall": 0.96881310298407,
+    "f05": 0.9917772979925582,
+    "f1": 0.9830392714854865,
+    "false_alarm_rate": 0.000572508158241255
+   },
+   "n_samples": 28784
+  },
+  "ctu13": {
+   "states": {
+    "1": {
+     "macro_f1": 0.45146577557043016,
+     "accuracy": 0.9934355621286423
+    },
+    "5": {
+     "macro_f1": 0.4181609498599411,
+     "accuracy": 0.9910726007614546
+    }
+   },
+   "early_warning": {
+    "n": 30468,
+    "positives": 626,
+    "auroc": 0.8521014992057209,
+    "auprc": 0.5066895329688503,
+    "precision": 0.8403041825095057,
+    "recall": 0.35303514376996803,
+    "f05": 0.6585220500595947,
+    "f1": 0.4971878515185602,
+    "false_alarm_rate": 0.0014074123718249448
+   },
+   "n_samples": 40618
+  }
+ },
+ "E3_lodo": {
+  "cic2017": {
+   "trained_on": [
+    "unsw",
+    "ctu13"
+   ],
+   "states": {
+    "1": {
+     "macro_f1": 0.15268668726466378,
+     "accuracy": 0.9786464307773758
+    },
+    "5": {
+     "macro_f1": 0.14472710324044652,
+     "accuracy": 0.9789851075565361
+    }
+   },
+   "early_warning": {
+    "n": 18130,
+    "positives": 464,
+    "auroc": 0.6010805872960723,
+    "auprc": 0.22163457633688258,
+    "precision": 0.6124031007751938,
+    "recall": 0.17025862068965517,
+    "f05": 0.40306122448979587,
+    "f1": 0.26644182124789206,
+    "false_alarm_rate": 0.0028302954828484093,
+    "threshold": 0.92
+   },
+   "n_samples": 23800
+  },
+  "unsw": {
+   "trained_on": [
+    "cic2017",
+    "ctu13"
+   ],
+   "states": {
+    "1": {
+     "macro_f1": 0.17934727898689323,
+     "accuracy": 0.8124179191594922
+    },
+    "5": {
+     "macro_f1": 0.1790805524750479,
+     "accuracy": 0.810207991242474
+    }
+   },
+   "early_warning": {
+    "n": 21924,
+    "positives": 4457,
+    "auroc": 0.13683596230869355,
+    "auprc": 0.1808998241438829,
+    "precision": 1.0,
+    "recall": 0.0008974646623289208,
+    "f05": 0.004471272076905879,
+    "f1": 0.0017933198834342075,
+    "false_alarm_rate": 0.0,
+    "threshold": 0.7
+   },
+   "n_samples": 28784
+  },
+  "ctu13": {
+   "trained_on": [
+    "cic2017",
+    "unsw"
+   ],
+   "states": {
+    "1": {
+     "macro_f1": 0.22873875522644405,
+     "accuracy": 0.8431540437456215
+    },
+    "5": {
+     "macro_f1": 0.22904769529095728,
+     "accuracy": 0.845149008796114
+    }
+   },
+   "early_warning": {
+    "n": 30468,
+    "positives": 626,
+    "auroc": 0.41092715565021576,
+    "auprc": 0.01630910224868346,
+    "precision": 0.004593929450369155,
+    "recall": 0.04472843450479233,
+    "f05": 0.0055986563224826045,
+    "f1": 0.008332093438476417,
+    "false_alarm_rate": 0.20330406809195095,
+    "threshold": 0.37
+   },
+   "n_samples": 40618
+  }
+ },
+ "E4_cases": {
+  "darpa2000": {
+   "model": "joint portable world model (CIC-IDS2017 + UNSW-NB15 + CTU-13)",
+   "states": {
+    "1": {
+     "macro_f1": 0.1991200973509314,
+     "accuracy": 0.9912395153774464
+    },
+    "5": {
+     "macro_f1": 0.19911978568694985,
+     "accuracy": 0.9912364259859021
+    }
+   },
+   "early_warning": {
+    "n": 5249,
+    "positives": 207,
+    "auroc": 0.4838717095240559,
+    "auprc": 0.03843734588267006,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f05": 0.0,
+    "f1": 0.0,
+    "false_alarm_rate": 0.0,
+    "threshold": 0.92
+   },
+   "n_samples": 5394,
+   "lead_time": {
+    "n_onsets": 42,
+    "warned_before_onset_rate": 0.0,
+    "events": [
+     {
+      "host": "172.16.112.10",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.10",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:15:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.10",
+      "state": "EXPLOITATION",
+      "minute": "2000-03-07 15:34:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.10",
+      "state": "INFILTRATION",
+      "minute": "2000-03-07 15:50:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.10",
+      "state": "IMPACT",
+      "minute": "2000-03-07 16:27:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.100",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.100",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:15:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.149",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.194",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.194",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:08:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.194",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:12:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.194",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:17:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.20",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.207",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:52:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.50",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.50",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:15:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.50",
+      "state": "EXPLOITATION",
+      "minute": "2000-03-07 15:34:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.50",
+      "state": "INFILTRATION",
+      "minute": "2000-03-07 15:50:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.112.50",
+      "state": "IMPACT",
+      "minute": "2000-03-07 16:27:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.105",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.105",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:12:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.148",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.148",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:13:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.168",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.169",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.204",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.207",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.50",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.50",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:12:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.113.84",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.20",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.20",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:08:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.20",
+      "state": "EXPLOITATION",
+      "minute": "2000-03-07 15:33:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.20",
+      "state": "INFILTRATION",
+      "minute": "2000-03-07 15:50:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.20",
+      "state": "IMPACT",
+      "minute": "2000-03-07 16:26:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.20",
+      "state": "IMPACT",
+      "minute": "2000-03-07 16:34:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.5",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 14:51:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.5",
+      "state": "IMPACT",
+      "minute": "2000-03-07 16:35:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.5",
+      "state": "IMPACT",
+      "minute": "2000-03-07 16:38:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.115.5",
+      "state": "IMPACT",
+      "minute": "2000-03-07 16:41:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.116.201",
+      "state": "IMPACT",
+      "minute": "2000-03-07 16:36:00",
+      "lead_minutes": 0
+     },
+     {
+      "host": "172.16.117.132",
+      "state": "RECONNAISSANCE",
+      "minute": "2000-03-07 15:12:00",
+      "lead_minutes": 0
+     }
+    ]
+   }
+  }
+ },
+ "E2_xgb_joint": {
+  "cic2017": {
+   "states": {
+    "1": {
+     "macro_f1": 0.395915874768347,
+     "accuracy": 0.9870290302655961
+    },
+    "5": {
+     "macro_f1": 0.3054906599376208,
+     "accuracy": 0.9846111417539989
+    }
+   },
+   "early_warning": {
+    "n": 18130,
+    "positives": 464,
+    "auroc": 0.7945177420488216,
+    "auprc": 0.3785776093305289,
+    "precision": 0.8292682926829268,
+    "recall": 0.21982758620689655,
+    "f05": 0.5334728033472803,
+    "f1": 0.3475298126064736,
+    "false_alarm_rate": 0.001188724102796332
+   },
+   "n_samples": 23800
+  },
+  "unsw": {
+   "states": {
+    "1": {
+     "macro_f1": 0.5826861093110212,
+     "accuracy": 0.9198526192908215
+    },
+    "5": {
+     "macro_f1": 0.5417302771547116,
+     "accuracy": 0.9043057836161285
+    }
+   },
+   "early_warning": {
+    "n": 21924,
+    "positives": 4457,
+    "auroc": 0.9972233739679679,
+    "auprc": 0.9892014678201233,
+    "precision": 0.9974178403755869,
+    "recall": 0.9533318375588962,
+    "f05": 0.9882774340605663,
+    "f1": 0.9748766777561088,
+    "false_alarm_rate": 0.0006297589740653804
+   },
+   "n_samples": 28784
+  },
+  "ctu13": {
+   "states": {
+    "1": {
+     "macro_f1": 0.4688309918360247,
+     "accuracy": 0.9933317765496484
+    },
+    "5": {
+     "macro_f1": 0.367387860554819,
+     "accuracy": 0.984114480766706
+    }
+   },
+   "early_warning": {
+    "n": 30468,
+    "positives": 626,
+    "auroc": 0.866885485066933,
+    "auprc": 0.39627066462634075,
+    "precision": 0.8544600938967136,
+    "recall": 0.29073482428115016,
+    "f05": 0.6156968876860622,
+    "f1": 0.433849821215733,
+    "false_alarm_rate": 0.0010388043696803162
+   },
+   "n_samples": 40618
+  }
+ },
+ "E1_xgb_single": {
+  "cic2017": {
+   "states": {
+    "1": {
+     "macro_f1": 0.3660201452173534,
+     "accuracy": 0.9863231271507985
+    },
+    "5": {
+     "macro_f1": 0.2413470448443611,
+     "accuracy": 0.9839492553778268
+    }
+   },
+   "early_warning": {
+    "n": 18130,
+    "positives": 464,
+    "auroc": 0.8680995688191226,
+    "auprc": 0.4161735665496461,
+    "precision": 0.6944444444444444,
+    "recall": 0.26939655172413796,
+    "f05": 0.5278716216216217,
+    "f1": 0.38819875776397517,
+    "false_alarm_rate": 0.00311332503113325
+   },
+   "n_samples": 23800
+  },
+  "unsw": {
+   "states": {
+    "1": {
+     "macro_f1": 0.5819916442565536,
+     "accuracy": 0.9195607763023493
+    },
+    "5": {
+     "macro_f1": 0.5450962227647169,
+     "accuracy": 0.9068144499178982
+    }
+   },
+   "early_warning": {
+    "n": 21924,
+    "positives": 4457,
+    "auroc": 0.9962987739346657,
+    "auprc": 0.989296427977035,
+    "precision": 0.9970407466423856,
+    "recall": 0.9827238052501682,
+    "f05": 0.9941440827999455,
+    "f1": 0.9898305084745763,
+    "false_alarm_rate": 0.0007442606057136314
+   },
+   "n_samples": 28784
+  },
+  "ctu13": {
+   "states": {
+    "1": {
+     "macro_f1": 0.481458359386822,
+     "accuracy": 0.9927609558651825
+    },
+    "5": {
+     "macro_f1": 0.3780229906194327,
+     "accuracy": 0.9855257975580938
+    }
+   },
+   "early_warning": {
+    "n": 30468,
+    "positives": 626,
+    "auroc": 0.8366284208653327,
+    "auprc": 0.36810711556330794,
+    "precision": 0.6225806451612903,
+    "recall": 0.3083067092651757,
+    "f05": 0.5171489817792069,
+    "f1": 0.41239316239316237,
+    "false_alarm_rate": 0.003920648750083774
+   },
+   "n_samples": 40618
+  }
+ },
+ "protocol": {
+  "features": "portable (26)",
+  "feature_names": [
+   "log_flows",
+   "log_total_pkts",
+   "log_fwd_bytes",
+   "log_bwd_bytes",
+   "log_bwd_fwd_byte_ratio",
+   "mean_log_duration",
+   "std_log_duration",
+   "mean_log_bytes_per_pkt",
+   "no_reply_frac",
+   "short_flow_frac",
+   "tcp_frac",
+   "udp_frac",
+   "icmp_frac",
+   "log_uniq_src_ip",
+   "log_uniq_dst_ip",
+   "log_uniq_dst_port",
+   "dst_port_entropy",
+   "src_ip_entropy",
+   "dst_ip_entropy",
+   "top_src_share",
+   "top_dst_share",
+   "log_max_src_port_fanout",
+   "log_max_src_host_fanout",
+   "wellknown_port_frac",
+   "outbound_frac",
+   "external_peer_frac"
+  ],
+  "cv_datasets": [
+   "cic2017",
+   "unsw",
+   "ctu13"
+  ],
+  "folds": 5,
+  "block_minutes": 30,
+  "seeds": "one per model",
+  "warning_horizon": 5,
+  "threshold": "max F0.5 on the validation fold",
+  "generated_at": "2026-09-28T17:55:32+00:00",
+  "runtime_seconds": 2538,
+  "support": {
+   "cic2017": {
+    "NORMAL": 33782,
+    "RECONNAISSANCE": 23,
+    "CREDENTIAL_ACCESS": 169,
+    "EXPLOITATION": 24,
+    "COMMAND_AND_CONTROL": 259,
+    "INFILTRATION": 6,
+    "IMPACT": 93
+   },
+   "ctu13": {
+    "NORMAL": 59173,
+    "RECONNAISSANCE": 54,
+    "COMMAND_AND_CONTROL": 132,
+    "IMPACT": 534
+   },
+   "darpa2000": {
+    "NORMAL": 5610,
+    "RECONNAISSANCE": 28,
+    "EXPLOITATION": 4,
+    "INFILTRATION": 3,
+    "IMPACT": 10
+   },
+   "unsw": {
+    "NORMAL": 33765,
+    "RECONNAISSANCE": 2342,
+    "CREDENTIAL_ACCESS": 557,
+    "EXPLOITATION": 4531,
+    "IMPACT": 105
+   }
+  }
+ },
+ "E5_transfer": {
+  "cic2018": {
+   "portable_model": {
+    "n_samples": 328482,
+    "early_warning": {
+     "n": 326172,
+     "positives": 88,
+     "auroc": 0.9544992101867784,
+     "auprc": 0.1183337206692275,
+     "precision": 0.8,
+     "recall": 0.09090909090909091,
+     "f05": 0.3125,
+     "f1": 0.163265306122449,
+     "false_alarm_rate": 6.133388942726414e-06,
+     "threshold": 0.92
+    },
+    "lead_time": {
+     "n_onsets": 2,
+     "warned_before_onset_rate": 0.0,
+     "events": [
+      {
+       "host": "172.31.69.25",
+       "state": "IMPACT",
+       "minute": "2018-02-20 10:13:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.31.69.25",
+       "state": "IMPACT",
+       "minute": "2018-02-20 13:14:00",
+       "lead_minutes": 0
+      }
+     ]
+    },
+    "nowcast_attack_recall": 0.1875,
+    "nowcast_per_state_recall": {
+     "IMPACT": 0.1875
+    },
+    "support": {
+     "NORMAL": 328402,
+     "IMPACT": 80
+    }
+   },
+   "portable_model_self_calibrated": {
+    "n_samples": 328482,
+    "early_warning": {
+     "n": 326172,
+     "positives": 88,
+     "auroc": 0.7430612901193334,
+     "auprc": 0.004235602130683371,
+     "precision": 0.02112676056338028,
+     "recall": 0.06818181818181818,
+     "f05": 0.02450980392156863,
+     "f1": 0.03225806451612903,
+     "false_alarm_rate": 0.0008525410630389716,
+     "threshold": 0.92
+    },
+    "lead_time": {
+     "n_onsets": 2,
+     "warned_before_onset_rate": 0.0,
+     "events": [
+      {
+       "host": "172.31.69.25",
+       "state": "IMPACT",
+       "minute": "2018-02-20 10:13:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.31.69.25",
+       "state": "IMPACT",
+       "minute": "2018-02-20 13:14:00",
+       "lead_minutes": 0
+      }
+     ]
+    },
+    "nowcast_attack_recall": 0.125,
+    "nowcast_per_state_recall": {
+     "IMPACT": 0.125
+    },
+    "support": {
+     "NORMAL": 328402,
+     "IMPACT": 80
+    }
+   },
+   "cic_model": {
+    "n_samples": 328482,
+    "early_warning": {
+     "n": 326172,
+     "positives": 88,
+     "auroc": 0.9639265426309562,
+     "auprc": 0.04309680146120506,
+     "precision": 0.06796116504854369,
+     "recall": 0.07954545454545454,
+     "f05": 0.06999999999999999,
+     "f1": 0.07329842931937172,
+     "false_alarm_rate": 0.00029440266925086786,
+     "threshold": 0.76
+    },
+    "lead_time": {
+     "n_onsets": 2,
+     "warned_before_onset_rate": 0.0,
+     "events": [
+      {
+       "host": "172.31.69.25",
+       "state": "IMPACT",
+       "minute": "2018-02-20 10:13:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.31.69.25",
+       "state": "IMPACT",
+       "minute": "2018-02-20 13:14:00",
+       "lead_minutes": 0
+      }
+     ]
+    },
+    "nowcast_attack_recall": 0.1375,
+    "nowcast_per_state_recall": {
+     "IMPACT": 0.1375
+    },
+    "support": {
+     "NORMAL": 328402,
+     "IMPACT": 80
+    }
+   },
+   "cic_model_self_calibrated": {
+    "n_samples": 328482,
+    "early_warning": {
+     "n": 326172,
+     "positives": 88,
+     "auroc": 0.952167476924518,
+     "auprc": 0.009836085563117597,
+     "precision": 0.028688524590163935,
+     "recall": 0.07954545454545454,
+     "f05": 0.03289473684210526,
+     "f1": 0.04216867469879518,
+     "false_alarm_rate": 0.0007268065897130801,
+     "threshold": 0.76
+    },
+    "lead_time": {
+     "n_onsets": 2,
+     "warned_before_onset_rate": 0.0,
+     "events": [
+      {
+       "host": "172.31.69.25",
+       "state": "IMPACT",
+       "minute": "2018-02-20 10:13:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.31.69.25",
+       "state": "IMPACT",
+       "minute": "2018-02-20 13:14:00",
+       "lead_minutes": 0
+      }
+     ]
+    },
+    "nowcast_attack_recall": 0.1375,
+    "nowcast_per_state_recall": {
+     "IMPACT": 0.1375
+    },
+    "support": {
+     "NORMAL": 328402,
+     "IMPACT": 80
+    }
+   }
+  },
+  "darpa2000": {
+   "portable_model": {
+    "n_samples": 5394,
+    "early_warning": {
+     "n": 5249,
+     "positives": 207,
+     "auroc": 0.4838717095240559,
+     "auprc": 0.03843734588267006,
+     "precision": 0.0,
+     "recall": 0.0,
+     "f05": 0.0,
+     "f1": 0.0,
+     "false_alarm_rate": 0.0,
+     "threshold": 0.92
+    },
+    "lead_time": {
+     "n_onsets": 42,
+     "warned_before_onset_rate": 0.0,
+     "events": [
+      {
+       "host": "172.16.112.10",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:27:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.100",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.100",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.149",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:08:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:17:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.207",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:52:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:27:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.105",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.105",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.148",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.148",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:13:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.168",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.169",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.204",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.207",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.84",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:08:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:33:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:26:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:35:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:38:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:41:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.116.201",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:36:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.117.132",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      }
+     ]
+    },
+    "nowcast_attack_recall": 0.0,
+    "nowcast_per_state_recall": {
+     "RECONNAISSANCE": 0.0,
+     "EXPLOITATION": 0.0,
+     "INFILTRATION": 0.0,
+     "IMPACT": 0.0
+    },
+    "support": {
+     "NORMAL": 5349,
+     "RECONNAISSANCE": 28,
+     "EXPLOITATION": 4,
+     "INFILTRATION": 3,
+     "IMPACT": 10
+    }
+   },
+   "portable_model_self_calibrated": {
+    "n_samples": 5394,
+    "early_warning": {
+     "n": 5249,
+     "positives": 207,
+     "auroc": 0.5302799479540938,
+     "auprc": 0.04096197356533677,
+     "precision": 0.0,
+     "recall": 0.0,
+     "f05": 0.0,
+     "f1": 0.0,
+     "false_alarm_rate": 0.001190003966679889,
+     "threshold": 0.92
+    },
+    "lead_time": {
+     "n_onsets": 42,
+     "warned_before_onset_rate": 0.0,
+     "events": [
+      {
+       "host": "172.16.112.10",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:27:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.100",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.100",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.149",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:08:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:17:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.207",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:52:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:27:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.105",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.105",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.148",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.148",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:13:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.168",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.169",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.204",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.207",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.84",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:08:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:33:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:26:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:35:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:38:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:41:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.116.201",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:36:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.117.132",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      }
+     ]
+    },
+    "nowcast_attack_recall": 0.0,
+    "nowcast_per_state_recall": {
+     "RECONNAISSANCE": 0.0,
+     "EXPLOITATION": 0.0,
+     "INFILTRATION": 0.0,
+     "IMPACT": 0.0
+    },
+    "support": {
+     "NORMAL": 5349,
+     "RECONNAISSANCE": 28,
+     "EXPLOITATION": 4,
+     "INFILTRATION": 3,
+     "IMPACT": 10
+    }
+   },
+   "cic_model": {
+    "n_samples": 5394,
+    "early_warning": {
+     "n": 5249,
+     "positives": 207,
+     "auroc": 0.4898983801765652,
+     "auprc": 0.040030553311060646,
+     "precision": 0.0,
+     "recall": 0.0,
+     "f05": 0.0,
+     "f1": 0.0,
+     "false_alarm_rate": 0.0,
+     "threshold": 0.76
+    },
+    "lead_time": {
+     "n_onsets": 42,
+     "warned_before_onset_rate": 0.0,
+     "events": [
+      {
+       "host": "172.16.112.10",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:27:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.100",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.100",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.149",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:08:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:17:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.207",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:52:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:27:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.105",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.105",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.148",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.148",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:13:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.168",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.169",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.204",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.207",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.84",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:08:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:33:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:26:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:35:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:38:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:41:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.116.201",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:36:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.117.132",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      }
+     ]
+    },
+    "nowcast_attack_recall": 0.0,
+    "nowcast_per_state_recall": {
+     "RECONNAISSANCE": 0.0,
+     "EXPLOITATION": 0.0,
+     "INFILTRATION": 0.0,
+     "IMPACT": 0.0
+    },
+    "support": {
+     "NORMAL": 5349,
+     "RECONNAISSANCE": 28,
+     "EXPLOITATION": 4,
+     "INFILTRATION": 3,
+     "IMPACT": 10
+    }
+   },
+   "cic_model_self_calibrated": {
+    "n_samples": 5394,
+    "early_warning": {
+     "n": 5249,
+     "positives": 207,
+     "auroc": 0.6020605656447195,
+     "auprc": 0.06812581509440852,
+     "precision": 0.0,
+     "recall": 0.0,
+     "f05": 0.0,
+     "f1": 0.0,
+     "false_alarm_rate": 0.0,
+     "threshold": 0.76
+    },
+    "lead_time": {
+     "n_onsets": 42,
+     "warned_before_onset_rate": 0.0,
+     "events": [
+      {
+       "host": "172.16.112.10",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.10",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:27:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.100",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.100",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.149",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:08:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.194",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:17:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.207",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:52:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:15:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.112.50",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:27:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.105",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.105",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.148",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.148",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:13:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.168",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.169",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.204",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.207",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.50",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.113.84",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:08:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "EXPLOITATION",
+       "minute": "2000-03-07 15:33:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "INFILTRATION",
+       "minute": "2000-03-07 15:50:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:26:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.20",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:34:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 14:51:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:35:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:38:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.115.5",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:41:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.116.201",
+       "state": "IMPACT",
+       "minute": "2000-03-07 16:36:00",
+       "lead_minutes": 0
+      },
+      {
+       "host": "172.16.117.132",
+       "state": "RECONNAISSANCE",
+       "minute": "2000-03-07 15:12:00",
+       "lead_minutes": 0
+      }
+     ]
+    },
+    "nowcast_attack_recall": 0.022222222222222223,
+    "nowcast_per_state_recall": {
+     "RECONNAISSANCE": 0.0,
+     "EXPLOITATION": 0.0,
+     "INFILTRATION": 0.0,
+     "IMPACT": 0.0
+    },
+    "support": {
+     "NORMAL": 5349,
+     "RECONNAISSANCE": 28,
+     "EXPLOITATION": 4,
+     "INFILTRATION": 3,
+     "IMPACT": 10
+    }
+   }
+  }
+ }
+}

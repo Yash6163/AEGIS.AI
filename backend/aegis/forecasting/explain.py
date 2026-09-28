@@ -17,12 +17,13 @@ from __future__ import annotations
 
 import numpy as np
 
-from .features import FEATURE_DESCRIPTIONS, FEATURE_NAMES
+from .features import FEATURE_DESCRIPTIONS, FEATURE_NAMES, PORTABLE_DESCRIPTIONS
 from .runtime import EnsembleRuntime, WorldModelRuntime
 from .states import STATE_NAMES
 
-# features stored as log1p(count); shown to analysts in natural units
-_LOG1P = {n for n in FEATURE_NAMES if n.startswith("log_") and n != "log_bwd_fwd_pkt_ratio"}
+DESCRIPTIONS = {**FEATURE_DESCRIPTIONS, **PORTABLE_DESCRIPTIONS}
+# features stored as log1p(count); shown to analysts in natural units (ratios excluded)
+_LOG1P = {n for n in DESCRIPTIONS if n.startswith("log_") and "ratio" not in n}
 
 
 def natural_value(name: str, value: float) -> float:
@@ -31,6 +32,7 @@ def natural_value(name: str, value: float) -> float:
 
 def explain(rt: WorldModelRuntime | EnsembleRuntime, x_raw: np.ndarray, top_k: int = 8) -> dict:
     """x_raw: (L, F) raw (unstandardised) feature history of one host."""
+    names = list(rt.manifest.get("features") or FEATURE_NAMES)
     x = rt.standardise(x_raw)[None]  # (1, L, F)
     L, F = x.shape[1], x.shape[2]
     _, p1 = rt.next_state_exact(rt.encode(x))
@@ -60,8 +62,8 @@ def explain(rt: WorldModelRuntime | EnsembleRuntime, x_raw: np.ndarray, top_k: i
         "target_probability": base,
         "feature_contributions": [
             {
-                "feature": FEATURE_NAMES[j],
-                "description": FEATURE_DESCRIPTIONS[FEATURE_NAMES[j]],
+                "feature": names[j],
+                "description": DESCRIPTIONS.get(names[j], names[j]),
                 "contribution": float(feat_delta[j]),
                 "attack_contribution": float(attack_delta[j]),
             }
@@ -72,10 +74,10 @@ def explain(rt: WorldModelRuntime | EnsembleRuntime, x_raw: np.ndarray, top_k: i
         ],
         "evidence": [
             {
-                "feature": FEATURE_NAMES[j],
-                "description": FEATURE_DESCRIPTIONS[FEATURE_NAMES[j]],
-                "observed": natural_value(FEATURE_NAMES[j], float(x_raw[-1, j])),
-                "training_mean": natural_value(FEATURE_NAMES[j], float(rt.mean[j])),
+                "feature": names[j],
+                "description": DESCRIPTIONS.get(names[j], names[j]),
+                "observed": natural_value(names[j], float(x_raw[-1, j])),
+                "training_mean": natural_value(names[j], float(rt.mean[j])),
                 "z_score": float(z_last[j]),
             }
             for j in evidence_order

@@ -21,6 +21,7 @@ class Settings(BaseSettings):
 
     database_url: str = f"sqlite:///{REPO_ROOT / 'aegis.db'}"
     model_dir: Path = REPO_ROOT / "models" / "aegis-wm-1.1.0"
+    portable_model_dir: Path = REPO_ROOT / "models" / "aegis-portable-1.0.0"
     scenario_path: Path = REPO_ROOT / "data" / "scenarios" / "cicids2017_replay.npz"
     upload_tmp_dir: Path | None = None  # None -> system temp dir
 

@@ -18,14 +18,31 @@ log = logging.getLogger("aegis.registry")
 @dataclass
 class Registry:
     production: ForecastEngine | None = None
+    portable: ForecastEngine | None = None  # multi-dataset model for non-CICFlowMeter formats
     cv_folds: dict[int, ForecastEngine] = field(default_factory=dict)
     metrics: dict | None = None
+    metrics_multi: dict | None = None
     scenarios: ScenarioStore | None = None
     errors: list[str] = field(default_factory=list)
 
     @property
     def ready(self) -> bool:
         return self.production is not None
+
+    def engine_for_profile(self, profile: str) -> ForecastEngine:
+        """CICFlowMeter uploads use the CIC model; binetflow/UNSW/PCAP use the portable model."""
+        if profile == "cic" or self.portable is None:
+            if profile != "cic":
+                raise RuntimeError(f"no model available for '{profile}' input (portable model not loaded)")
+            assert self.production is not None
+            return self.production
+        return self.portable
+
+    def by_version(self, version: str | None) -> ForecastEngine | None:
+        for e in (self.production, self.portable):
+            if e is not None and e.version == version:
+                return e
+        return None
 
     def engine_for_replay(self, fold: int, use_cv: bool = True) -> tuple[ForecastEngine, str]:
         """CV model of the fold that held this minute out, so replayed forecasts
@@ -54,9 +71,18 @@ def load_registry(settings: Settings) -> Registry:
             reg.cv_folds[int(fold_dir.name[4:])] = ForecastEngine.load(fold_dir)
         except (ArtifactError, OSError, ValueError, KeyError) as exc:
             reg.errors.append(f"cv {fold_dir.name}: {exc}")
+    portable_dir = Path(settings.portable_model_dir)
+    if portable_dir.is_dir():
+        try:
+            reg.portable = ForecastEngine.load(portable_dir)
+        except (ArtifactError, OSError, ValueError, KeyError) as exc:
+            reg.errors.append(f"portable model: {exc}")
     metrics_path = model_dir / "metrics.json"
     if metrics_path.is_file():
         reg.metrics = json.loads(metrics_path.read_text())
+    multi_path = model_dir / "metrics_multi.json"
+    if multi_path.is_file():
+        reg.metrics_multi = json.loads(multi_path.read_text())
     try:
         reg.scenarios = ScenarioStore(settings.scenario_path)
     except (OSError, ValueError, KeyError) as exc:
