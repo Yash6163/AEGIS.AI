@@ -34,7 +34,7 @@ python ml/prepare_multi.py          # -> data/processed/windows_multi.parquet (+
 python ml/evaluate_multi.py         # E1-E4 -> models/aegis-wm-1.1.0/metrics_multi.json, exports aegis-portable-1.0.0
 python ml/evaluate_transfer.py      # E5 zero-shot transfer -> metrics_multi.json["E5_transfer"]
 cp data/processed/windows_multi_meta.json models/aegis-portable-1.0.0/datasets.json
-python presentation/build_deck.py   # SIH deck, every number read from the JSON files above
+python presentation/build_deck.py   # SIH deck (local only, not in git)
 ```
 
 DARPA 2000 flows are built from the raw PCAP by the same pure-Python flow builder the
