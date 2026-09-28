@@ -11,7 +11,7 @@ import numpy as np
 
 from .explain import explain as explain_forecast
 from .risk import assess, step_labels
-from .runtime import WorldModelRuntime
+from .runtime import EnsembleRuntime, WorldModelRuntime, load_runtime
 from .states import ATTACK_STATES, COMPROMISE_STATES, STATE_INFO, STATE_NAMES, AttackState
 
 TREE_DEPTH = 4
@@ -56,7 +56,7 @@ def _top_paths(paths: np.ndarray, k: int = 5) -> list[dict]:
 
 
 class ForecastEngine:
-    def __init__(self, runtime: WorldModelRuntime):
+    def __init__(self, runtime: WorldModelRuntime | EnsembleRuntime):
         self.rt = runtime
         self.manifest = runtime.manifest
         ew = self.manifest.get("early_warning", {})
@@ -66,7 +66,7 @@ class ForecastEngine:
 
     @classmethod
     def load(cls, artifact_dir: str | Path) -> ForecastEngine:
-        return cls(WorldModelRuntime.load(artifact_dir))
+        return cls(load_runtime(artifact_dir))
 
     @property
     def version(self) -> str:
@@ -99,11 +99,13 @@ class ForecastEngine:
             return []
         H = max(self.warning_horizon, 1)
         x = self.rt.standardise(histories)
-        r = self.rt.rollout(x, H, n_samples, seed=seed)
-        _, p1 = self.rt.next_state_exact(self.rt.encode(x))
+        h = self.rt.encode(x)
+        r = self.rt.rollout(x, H, n_samples, seed=seed, h0=h)
+        _, p1 = self.rt.next_state_exact(h)
+        p_attack = self.rt.attack_within_exact(h, H)
         out = []
         for i in range(len(histories)):
-            a = assess(r.nowcast[i], r.marginals[i], r.paths[i])
+            a = assess(r.nowcast[i], r.marginals[i], r.paths[i], attack_probability=p_attack[i])
             cur, nxt = int(r.nowcast[i].argmax()), int(p1[i].argmax())
             out.append({
                 "current_state": STATE_NAMES[cur], "current_probability": float(r.nowcast[i, cur]),
@@ -127,11 +129,13 @@ class ForecastEngine:
         hist, padded = self.prepare_history(history_raw)
         K = max(horizon, self.warning_horizon)
         x = self.rt.standardise(hist)[None]
-        r = self.rt.rollout(x, K, n_samples, seed=seed)
+        h = self.rt.encode(x)
+        r = self.rt.rollout(x, K, n_samples, seed=seed, h0=h)
         paths, marg, now = r.paths[0], r.marginals[0], r.nowcast[0]
         ood = self.ood_score(hist)
-        risk = assess(now, marg[:horizon + 1], paths[:, :horizon + 1], out_of_distribution=ood > 1.0)
-        warn_p = float((paths[:, 1:self.warning_horizon + 1] != 0).any(axis=1).mean())
+        risk = assess(now, marg[:horizon + 1], paths[:, :horizon + 1], out_of_distribution=ood > 1.0,
+                      attack_probability=float(self.rt.attack_within_exact(h, horizon)[0]))
+        warn_p = float(self.rt.attack_within_exact(h, self.warning_horizon)[0])
         cur = int(now.argmax())
         result = {
             "model_version": self.version,

@@ -59,7 +59,8 @@ class RiskAssessment:
     uncertainty_reasons: list[str]
 
 
-def assess(nowcast: np.ndarray, marginals: np.ndarray, paths: np.ndarray, out_of_distribution: bool = False) -> RiskAssessment:
+def assess(nowcast: np.ndarray, marginals: np.ndarray, paths: np.ndarray, out_of_distribution: bool = False,
+           attack_probability: float | None = None) -> RiskAssessment:
     """Risk for a single host.
 
     nowcast (S,), marginals (K+1, S), paths (N, K+1) sampled trajectories.
@@ -73,10 +74,14 @@ def assess(nowcast: np.ndarray, marginals: np.ndarray, paths: np.ndarray, out_of
     score = 100.0 * max(current_sev, expected_peak)
     p_attack, t_attack = first_hit(paths, ATTACK_STATES)
     p_comp, t_comp = first_hit(paths, COMPROMISE_STATES)
+    if attack_probability is not None:  # exact value supplied by the runtime
+        p_attack = float(attack_probability)
 
     ent = normalised_entropy(marginals[1:])
     conf = float(1.0 - ent.mean())
-    se = float(np.sqrt(max(p_attack * (1 - p_attack), 1e-12) / n))
+    # Monte-Carlo s.e. of the sampled compromise probability (attack probability is exact
+    # when supplied by the runtime)
+    se = float(np.sqrt(max(p_comp * (1 - p_comp), 1e-12) / n))
     reasons = []
     if ent[0] > UNCERTAIN_ENTROPY or marginals[1].max() < UNCERTAIN_MAX_PROB:
         reasons.append("next-minute state distribution is diffuse")

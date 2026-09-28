@@ -18,7 +18,7 @@ from __future__ import annotations
 import numpy as np
 
 from .features import FEATURE_DESCRIPTIONS, FEATURE_NAMES
-from .runtime import WorldModelRuntime
+from .runtime import EnsembleRuntime, WorldModelRuntime
 from .states import STATE_NAMES
 
 # features stored as log1p(count); shown to analysts in natural units
@@ -29,7 +29,7 @@ def natural_value(name: str, value: float) -> float:
     return float(np.expm1(value)) if name in _LOG1P else float(value)
 
 
-def explain(rt: WorldModelRuntime, x_raw: np.ndarray, top_k: int = 8) -> dict:
+def explain(rt: WorldModelRuntime | EnsembleRuntime, x_raw: np.ndarray, top_k: int = 8) -> dict:
     """x_raw: (L, F) raw (unstandardised) feature history of one host."""
     x = rt.standardise(x_raw)[None]  # (1, L, F)
     L, F = x.shape[1], x.shape[2]

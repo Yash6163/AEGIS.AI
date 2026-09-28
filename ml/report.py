@@ -1,6 +1,6 @@
 """Render models/<version>/metrics.json as docs/RESULTS.md (no hand-typed numbers).
 
-Usage: python ml/report.py [--version aegis-wm-1.0.0]
+Usage: python ml/report.py [--version aegis-wm-1.1.0]
 """
 
 from __future__ import annotations
@@ -65,7 +65,7 @@ def table(m: dict, key: str, fmt) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--version", default="aegis-wm-1.0.0")
+    ap.add_argument("--version", default="aegis-wm-1.1.0")
     args = ap.parse_args()
     m = json.loads((ROOT / "models" / args.version / "metrics.json").read_text())
     manifest = json.loads((ROOT / "models" / args.version / "manifest.json").read_text())
@@ -106,7 +106,7 @@ def main() -> None:
     if c:
         out += ["", f"Compromise probability (exploitation / C2 / infiltration within the horizon): AUROC {f3(c['auroc'])}, "
                 f"AUPRC {f3(c['auprc'])}, {c['positives']} positives."]
-    out += ["", "Thresholds were selected on validation folds for a false-alarm rate <= 2 % on quiet host-minutes.", "",
+    out += ["", "Each model's threshold maximises F0.5 of this decision on its validation fold (same rule for all models).", "",
             "## Forecast lead time", "", lt["definition"], "",
             "| onset group | n | warned before onset | mean lead | median lead when warned | detected at onset |",
             "|---|---:|---:|---:|---:|---:|"]
@@ -150,11 +150,11 @@ def _replace(text: str, tag: str, body: str) -> str:
 
 def update_readme(m: dict) -> None:
     """Write the headline and the main results table into README.md markers."""
-    wm, fc = m["forecast"]["world_model"], m["forecast"]
+    fc = m["forecast"]
     ew = m["early_warning"]["models"]
     deploy = [k for k in ("xgboost_direct", "random_forest", "markov_nowcast") if k in fc]
-    best5 = max(deploy, key=lambda k: fc[k]["5"]["macro_f1"])
     lt = m["lead_time"]
+
     def row(label, ours, base_vals):
         bname, bval = max(base_vals.items(), key=lambda kv: -1 if kv[1] is None else kv[1])
         o, b = f3(ours), f3(bval)
@@ -167,6 +167,25 @@ def update_readme(m: dict) -> None:
     fb = lambda r, b: fbeta(r["precision_at_threshold"], r["recall_at_threshold"], b)  # noqa: E731
     f5 = lambda k, b: fbeta(fc[k]["5"]["attack_precision"], fc[k]["5"]["attack_recall"], b)  # noqa: E731
     wm5 = fc["world_model"]["5"]
+    rows_spec = [
+        ("early-warning AUROC", ew["world_model"]["auroc"], [r["auroc"] for r in ewb.values()]),
+        ("early-warning AUPRC", ew["world_model"]["auprc"], [r["auprc"] for r in ewb.values()]),
+        ("early-warning F0.5", fb(ew["world_model"], 0.5), [fb(r, 0.5) for r in ewb.values()]),
+        ("early-warning F1", fb(ew["world_model"], 1), [fb(r, 1) for r in ewb.values()]),
+        ("early-warning F2", fb(ew["world_model"], 2), [fb(r, 2) for r in ewb.values()]),
+        ("macro-F1 at +5 min", wm5["macro_f1"], [fc[k]["5"]["macro_f1"] for k in deploy]),
+        ("attack precision at +5 min", wm5["attack_precision"], [fc[k]["5"]["attack_precision"] for k in deploy]),
+        ("attack recall at +5 min", wm5["attack_recall"], [fc[k]["5"]["attack_recall"] for k in deploy]),
+        ("attack F0.5 at +5 min", f5("world_model", 0.5), [f5(k, 0.5) for k in deploy]),
+        ("attack F2 at +5 min", f5("world_model", 2), [f5(k, 2) for k in deploy]),
+    ]
+    wins = [n for n, o, bs in rows_spec if o is not None and o > max(v for v in bs if v is not None)]
+    loses = [n for n, o, bs in rows_spec if o is not None and o < max(v for v in bs if v is not None)]
+    summary = (f"**Summary (generated):** the world model is best on {len(wins)} of {len(rows_spec)} rows"
+               + (f"; a baseline is better on: {', '.join(loses)}." if loses else ".")
+               + f" {pc(lt['all']['forecast_before_onset_rate'])} of {lt['all']['n_onsets']} attack onsets were warned about "
+               f"before they began, at {lt['false_warnings_per_host_hour']:.2f} false warnings per host-hour. "
+               "See [Limitations](#17-limitations).")
     lines = [
         f"**Cross-validated on CIC-IDS2017** ({m['protocol']['n_samples']:,} held-out host-minutes, 5-fold blocked CV). "
         "Bold = better of the two; the baseline column shows the strongest deployable baseline for that row.", "",
@@ -182,10 +201,7 @@ def update_readme(m: dict) -> None:
         "| attack 5 min ahead, F0.5 | " + row("", f5("world_model", 0.5), {short[k]: f5(k, 0.5) for k in deploy}).split("|", 2)[2],
         "| attack 5 min ahead, F2 | " + row("", f5("world_model", 2), {short[k]: f5(k, 2) for k in deploy}).split("|", 2)[2],
         "",
-        "**In one line:** the world model ranks risk better (AUROC) and forecasts the future state better across all seven states "
-        "(macro-F1, attack recall, F2 at +5 min), but it is less precise: precision-weighted scores (AUPRC, F0.5) and the "
-        f"thresholded early-warning F-scores are equal to or slightly worse than simple baselines. {pc(lt['all']['forecast_before_onset_rate'])} of {lt['all']['n_onsets']} attack onsets were warned about "
-        f"before they began, at {lt['false_warnings_per_host_hour']:.2f} false warnings per host-hour. See [Limitations](#17-limitations).",
+        summary,
     ]
     headline = "\n".join(lines)
     results = (table(m, "macro_f1", f3) + "\n\n*Macro-F1 by forecast horizon, pooled out-of-fold. Oracle rows are given the true current state.*"

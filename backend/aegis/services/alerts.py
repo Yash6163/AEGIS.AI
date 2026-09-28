@@ -54,6 +54,16 @@ def alert_level(summary: dict) -> str:
     return level if LEVEL_ORDER[level] >= 1 else "MEDIUM"
 
 
+def most_likely_attack_state(forecast: dict) -> str:
+    """Attack state with the highest forecast probability at any future step."""
+    best, best_p = "UNKNOWN", -1.0
+    for step in forecast["steps"][1:]:
+        for state, p in step["distribution"].items():
+            if state != "NORMAL" and p > best_p:
+                best, best_p = state, p
+    return best
+
+
 def persist_forecast(db: Session, *, source: str, context: str | None, host: str | None,
                      window_start: datetime | None, forecast: dict) -> Forecast:
     nxt = forecast["steps"][1] if len(forecast["steps"]) > 1 else forecast["steps"][0]
@@ -74,15 +84,14 @@ def persist_forecast(db: Session, *, source: str, context: str | None, host: str
 def create_alert(db: Session, *, source: str, context: str | None, host: str, window_start: datetime | None,
                  forecast: dict, summary: dict) -> Alert:
     fc = persist_forecast(db, source=source, context=context, host=host, window_start=window_start, forecast=forecast)
-    steps = forecast["steps"]
-    attack_steps = [s for s in steps[1:] if s["state"] != "NORMAL"]
-    predicted = attack_steps[0]["state"] if attack_steps else steps[-1]["state"]
+    predicted = most_likely_attack_state(forecast)
     ew = forecast["early_warning"]
-    title = (f"{host}: P(attack within {ew['horizon']} min) = {ew['probability']:.0%}"
-             f" - most likely next attack stage {predicted}")
+    level = alert_level(summary)
+    title = (f"{host}: {level} - P(attack within {ew['horizon']} min) {ew['probability']:.0%},"
+             f" most likely attack stage {predicted}")
     alert = Alert(
         source=source, context=context, host=host, window_start=window_start,
-        level=alert_level(summary), title=title[:255], predicted_state=predicted,
+        level=level, title=title[:255], predicted_state=predicted,
         current_state=forecast["current"]["state"],
         attack_probability=forecast["risk"]["attack_probability"],
         compromise_probability=forecast["risk"]["compromise_probability"],

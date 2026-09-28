@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 from aegis.config import REPO_ROOT, Settings, get_settings
 from aegis.forecasting.engine import ForecastEngine
 
-MODEL_DIR = REPO_ROOT / "models" / "aegis-wm-1.0.0"
+MODEL_DIR = REPO_ROOT / "models" / "aegis-wm-1.1.0"
 
 
 @pytest.fixture(scope="session")

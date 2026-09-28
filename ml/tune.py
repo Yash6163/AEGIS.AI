@@ -28,13 +28,13 @@ sys.path.insert(0, str(ROOT / "ml"))
 import data as D  # noqa: E402
 import train as TR  # noqa: E402
 
+# Round 1 (tuning.log): HIDDEN x DROPOUT x SELECT x INPUT_CLIP -> 64 / 0.4 / unweighted / 0.
+# Round 2 (this grid): class-weight strength, the main precision/recall lever.
 GRID = {
-    "HIDDEN": [32, 64],
+    "CLASS_WEIGHT_POWER": [0.0, 0.25, 0.5],
     "DROPOUT": [0.2, 0.4],
-    "SELECT": ["weighted", "unweighted"],
-    "INPUT_CLIP": [0.0, 8.0],
 }
-FIXED = {"LR": 1e-3, "WEIGHT_DECAY": 1e-3}
+FIXED = {"LR": 1e-3, "WEIGHT_DECAY": 1e-3, "HIDDEN": 64, "SELECT": "unweighted", "INPUT_CLIP": 0.0}
 
 
 def score(rt, va) -> dict:
@@ -47,7 +47,13 @@ def score(rt, va) -> dict:
     valid = fut[:, -1] >= 0
     target = (fut[valid] > 0).any(1)
     s = TR.attack_within(r.paths, 5)[valid]
+    pred1 = p1[m1].argmax(1)
+    tp = float(((pred1 != 0) & (y1 != 0)).sum())
+    prec = tp / max(float((pred1 != 0).sum()), 1.0)
+    rec = tp / max(float((y1 != 0).sum()), 1.0)
+    f05 = 1.25 * prec * rec / (0.25 * prec + rec) if tp else 0.0
     return {
+        "attack_f05_k1": f05,
         "f1_k0": f1_score(y0, p0.argmax(1), average="macro", labels=sorted(set(y0.tolist())), zero_division=0),
         "f1_k1": f1_score(y1, p1[m1].argmax(1), average="macro", labels=sorted(set(y1.tolist())), zero_division=0),
         "ew_auprc": average_precision_score(target, s) if target.any() else float("nan"),
@@ -83,8 +89,9 @@ def main() -> None:
         agg = {k: float(np.nanmean([p[k] for p in per])) for k in per[0]}
         results.append({"config": cfg, **agg})
         print(json.dumps({**cfg, **{k: round(v, 3) for k, v in agg.items()}}), f"({time.time() - t0:.0f}s)", flush=True)
-    results.sort(key=lambda r: -(r["f1_k1"] + r["ew_auprc"]))
-    (ROOT / "data" / "processed" / "tuning.json").write_text(json.dumps(results, indent=1))
+    # precision-aware criterion (round 2): macro-F1, AUPRC and attack F0.5
+    results.sort(key=lambda r: -(r["f1_k1"] + r["ew_auprc"] + r["attack_f05_k1"]))
+    (ROOT / "data" / "processed" / "tuning_round2.json").write_text(json.dumps(results, indent=1))
     print("best:", results[0])
 
 
