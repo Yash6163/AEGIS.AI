@@ -17,7 +17,7 @@ import hashlib
 import json
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -36,9 +36,10 @@ from aegis.forecasting.runtime import WorldModelRuntime  # noqa: E402
 from aegis.forecasting.states import ATTACK_STATES, NUM_STATES, STATE_NAMES  # noqa: E402
 
 N_SEEDS = 3
-HIDDEN, STATE_EMB, DROPOUT = 64, 16, 0.2
-LR, WEIGHT_DECAY, BATCH, MAX_EPOCHS, PATIENCE = 2e-3, 1e-4, 128, 120, 15
-SELECT = "weighted"  # early-stopping criterion: class-weighted or plain validation NLL
+# Selected by ml/tune.py on validation folds (see models/<version>/tuning.json)
+HIDDEN, STATE_EMB, DROPOUT = 64, 16, 0.4
+LR, WEIGHT_DECAY, BATCH, MAX_EPOCHS, PATIENCE = 1e-3, 1e-3, 128, 120, 15
+SELECT = "unweighted"  # early-stopping criterion: class-weighted or plain validation NLL
 INPUT_CLIP = 0.0  # >0: clip standardised features to [-c, c] (model and runtime)
 WARNING_HORIZON = 5
 TARGET_FALSE_ALARM_RATE = 0.02
@@ -193,7 +194,7 @@ def main() -> None:
     manifest = {
         "model_version": args.version,
         "model_type": "GRU latent world model (autoregressive attack-state transition model)",
-        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "created_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "dataset": meta["dataset"],
         "dataset_sha256": meta["raw_file_sha256"],
         "window_seconds": meta["window_seconds"],

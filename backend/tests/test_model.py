@@ -112,6 +112,7 @@ def test_diffuse_forecast_is_flagged_uncertain():
 def test_torch_parity():
     torch = pytest.importorskip("torch")
     import sys
+
     from aegis.config import REPO_ROOT
     sys.path.insert(0, str(REPO_ROOT / "ml"))
     from model import AttackWorldModel

@@ -20,7 +20,7 @@ type Dashboard = {
   audit: { entries: number };
 };
 
-type Metrics = { forecast: Record<string, Record<string, { macro_f1: number }>>; early_warning: { models: Record<string, { auroc: number | null }> } };
+type Metrics = { forecast: Record<string, Record<string, { macro_f1: number }>>; early_warning: { models: Record<string, { auroc: number | null; auprc: number | null }> } };
 
 export default function Overview() {
   const dash = useApi<Dashboard>("/dashboard");
@@ -41,9 +41,11 @@ export default function Overview() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Card title="Forecasting vs. baselines" subtitle={m ? "5-fold blocked cross-validation on CIC-IDS2017, out-of-fold" : undefined} className="lg:col-span-2">
           {!m ? <Skeleton className="h-28" /> : (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
               <Stat label="Early-warning AUROC" value={ew?.world_model?.auroc?.toFixed(3) ?? "-"}
                 hint={`XGBoost ${ew?.xgboost_direct?.auroc?.toFixed(3) ?? "-"} · Markov ${ew?.markov_nowcast?.auroc?.toFixed(3) ?? "-"}`} />
+              <Stat label="Early-warning AUPRC" value={ew?.world_model?.auprc?.toFixed(3) ?? "-"}
+                hint={`XGBoost ${ew?.xgboost_direct?.auprc?.toFixed(3) ?? "-"} · Markov ${ew?.markov_nowcast?.auprc?.toFixed(3) ?? "-"}`} />
               <Stat label="Macro-F1 at +5 min" value={f5("world_model")?.toFixed(3) ?? "-"}
                 hint={`XGBoost ${f5("xgboost_direct")?.toFixed(3) ?? "-"} · Markov ${f5("markov_nowcast")?.toFixed(3) ?? "-"}`} />
               <Stat label="Onsets warned in advance" value={pct(d?.headline_metrics?.lead_time?.forecast_before_onset_rate)}

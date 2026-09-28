@@ -7,7 +7,7 @@ import hmac
 import logging
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import timezone
+from datetime import UTC
 
 import numpy as np
 import pandas as pd
@@ -120,10 +120,10 @@ def run_job(job_id: str, stored: StoredUpload, suffix: str, settings: Settings) 
             times = g.index.get_level_values("window_start")
             st = stats.loc[host]
             gate = alert_svc.AlertGate()
-            for j, (ts, s) in enumerate(zip(times, summaries)):
+            for j, (ts, s) in enumerate(zip(times, summaries, strict=False)):
                 label_state = STATE_NAMES[int(labels.loc[(host, ts)])] if labels is not None else None
                 rows.append(TrafficWindow(
-                    job_id=job_id, host=shown, window_start=ts.to_pydatetime().replace(tzinfo=timezone.utc),
+                    job_id=job_id, host=shown, window_start=ts.to_pydatetime().replace(tzinfo=UTC),
                     features=[round(float(v), 6) for v in X[j]],
                     stats={k: int(v) for k, v in st.loc[ts].items()},
                     label_state=label_state, **{k: s[k] for k in (
@@ -140,7 +140,7 @@ def run_job(job_id: str, stored: StoredUpload, suffix: str, settings: Settings) 
                 fc = engine.forecast(h, horizon=settings.default_horizon, n_samples=settings.mc_samples, seed=j)
                 fc["context"] = {"source": "upload", "job_id": job_id, "host": shown, "window_start": ts.isoformat()}
                 alert_svc.create_alert(db, source="upload", context=job_id, host=shown,
-                                       window_start=ts.to_pydatetime().replace(tzinfo=timezone.utc), forecast=fc, summary=s)
+                                       window_start=ts.to_pydatetime().replace(tzinfo=UTC), forecast=fc, summary=s)
                 created += 1
             if len(alert_candidates) > MAX_ALERTS_PER_JOB:
                 warnings.append(f"alert cap reached: {len(alert_candidates) - MAX_ALERTS_PER_JOB} further alert episodes not raised.")
@@ -152,8 +152,8 @@ def run_job(job_id: str, stored: StoredUpload, suffix: str, settings: Settings) 
             job.n_flows = int(len(flows))
             job.n_hosts = int(feats.index.get_level_values("entity").nunique())
             job.n_windows = int(times_all.nunique())
-            job.start_time = pd.Timestamp(times_all.min()).to_pydatetime().replace(tzinfo=timezone.utc)
-            job.end_time = pd.Timestamp(times_all.max()).to_pydatetime().replace(tzinfo=timezone.utc)
+            job.start_time = pd.Timestamp(times_all.min()).to_pydatetime().replace(tzinfo=UTC)
+            job.end_time = pd.Timestamp(times_all.max()).to_pydatetime().replace(tzinfo=UTC)
             job.warnings = warnings
             job.has_labels = has_labels
             audit.append(db, "analysis.completed", job_id, {

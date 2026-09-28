@@ -6,7 +6,7 @@ import contextvars
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 request_id_var: contextvars.ContextVar[str | None] = contextvars.ContextVar("request_id", default=None)
 
@@ -16,7 +16,7 @@ _RESERVED = set(vars(logging.makeLogRecord({})).keys()) | {"message", "asctime"}
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         body = {
-            "ts": datetime.fromtimestamp(record.created, timezone.utc).isoformat(timespec="milliseconds"),
+            "ts": datetime.fromtimestamp(record.created, UTC).isoformat(timespec="milliseconds"),
             "level": record.levelname,
             "logger": record.name,
             "msg": record.getMessage(),

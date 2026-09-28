@@ -87,10 +87,10 @@
   ],
   "history": 10,
   "max_horizon": 10,
-  "temperature": 0.7,
+  "temperature": 0.8,
   "early_warning": {
     "horizon": 5,
-    "threshold": 0.92
+    "threshold": 0.75
   },
   "ood_reference": {
     "statistic": "max_abs_z_of_window",
@@ -98,5 +98,5 @@
     "p999": 12.105669319566658,
     "max": 81.15100293996896
   },
-  "weights_sha256": "a934fec8f9c2ef308aeb5e80bb43c651e572dc928d4bfe91620b109f07cbcf92"
+  "weights_sha256": "0ea891acceb7f84e57ba5834d635668995bcde743ab0a9942c709747b3611a29"
 }

@@ -54,7 +54,7 @@ class AttackWorldModel(nn.Module):
             prev = torch.where(states[:, k] >= 0, states[:, k], prev)
         return torch.stack(logits, dim=1)
 
-    def export_numpy(self) -> dict[str, "object"]:
+    def export_numpy(self) -> dict[str, object]:
         sd = {k: v.detach().cpu().numpy() for k, v in self.state_dict().items()}
         return {
             "inp_w": sd["inp.weight"], "inp_b": sd["inp.bias"],

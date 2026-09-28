@@ -1,0 +1,61 @@
+# Production-style stack: Postgres + inference API + web console.
+#   cp .env.example .env   # then set SECRET_KEY, API_KEY, POSTGRES_PASSWORD
+#   docker compose up --build
+# Only the web console is published; the API is reachable from it over the
+# internal network (uncomment the backend port mapping for direct API access).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aegis
+      POSTGRES_USER: aegis
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aegis -d aegis"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+psycopg://aegis:${POSTGRES_PASSWORD}@db:5432/aegis
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      API_KEY: ${API_KEY:?set API_KEY in .env}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      TRUSTED_PROXY_COUNT: "1"
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-600}
+    # ports: ["8000:8000"]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      BACKEND_URL: http://backend:8000
+      API_KEY: ${API_KEY}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+
+volumes:
+  pgdata:

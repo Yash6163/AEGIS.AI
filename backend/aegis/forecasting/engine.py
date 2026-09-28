@@ -65,7 +65,7 @@ class ForecastEngine:
         self.ood_p999 = float(self.manifest.get("ood_reference", {}).get("p999", np.inf))
 
     @classmethod
-    def load(cls, artifact_dir: str | Path) -> "ForecastEngine":
+    def load(cls, artifact_dir: str | Path) -> ForecastEngine:
         return cls(WorldModelRuntime.load(artifact_dir))
 
     @property

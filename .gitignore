@@ -33,3 +33,4 @@ coverage/
 .DS_Store
 *.pem
 .claude/settings.local.json
+frontend/.next-build/

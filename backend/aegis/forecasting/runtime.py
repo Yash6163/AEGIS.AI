@@ -72,7 +72,7 @@ class WorldModelRuntime:
 
     # ------------------------------------------------------------------ io
     @classmethod
-    def load(cls, artifact_dir: str | Path) -> "WorldModelRuntime":
+    def load(cls, artifact_dir: str | Path) -> WorldModelRuntime:
         d = Path(artifact_dir)
         manifest_path, weights_path = d / "manifest.json", d / "weights.npz"
         if not manifest_path.is_file() or not weights_path.is_file():

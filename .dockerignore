@@ -1,0 +1,15 @@
+**/node_modules
+**/.next
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+.venv
+.git
+data/raw
+data/processed
+data/samples
+*.db
+.env
+.env.*
+frontend
+ml

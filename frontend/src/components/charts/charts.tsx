@@ -260,13 +260,13 @@ export function LineChart({ series, xLabels, yMax = 1, yFormat = (v: number) => 
   const ref = React.useRef<HTMLDivElement>(null);
   const { setTip, Tip } = useTip();
   const [hover, setHover] = useState<number | null>(null);
-  const W = 640, H = height, padL = 40, padR = 12, padT = 8, padB = 22;
+  const W = useWidth(ref, 640), H = height, padL = 40, padR = 16, padT = 8, padB = 22;
   const iw = W - padL - padR, ih = H - padT - padB;
   const x = (i: number) => padL + (xLabels.length === 1 ? iw / 2 : (i / (xLabels.length - 1)) * iw);
   const y = (v: number) => padT + ih * (1 - v / yMax);
   return (
     <div ref={ref} className="relative">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={series.map((s) => s.name).join(", ")}
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="block" role="img" aria-label={series.map((s) => s.name).join(", ")}
         onMouseLeave={() => { setHover(null); setTip(null); }}
         onMouseMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();

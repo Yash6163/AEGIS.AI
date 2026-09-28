@@ -49,7 +49,7 @@ class Settings(BaseSettings):
         return v
 
     @model_validator(mode="after")
-    def _production_guards(self) -> "Settings":
+    def _production_guards(self) -> Settings:
         if self.app_env == "production":
             if self.secret_key.startswith("dev-insecure"):
                 raise ValueError("SECRET_KEY must be set in production")
