@@ -1,0 +1,1359 @@
+{
+ "dataset": "CIC-IDS2017 (Canadian Institute for Cybersecurity), GeneratedLabelledFlows",
+ "citation": "Sharafaldin, Lashkari, Ghorbani. Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization. ICISSP 2018.",
+ "features": [
+  "log_flows",
+  "log_fwd_pkts",
+  "log_bwd_pkts",
+  "log_fwd_bytes",
+  "log_bwd_bytes",
+  "log_bwd_fwd_pkt_ratio",
+  "mean_log_duration",
+  "std_log_duration",
+  "mean_log_iat_mean",
+  "mean_log_iat_std",
+  "mean_log_iat_max",
+  "syn_rate",
+  "fin_rate",
+  "rst_rate",
+  "psh_rate",
+  "ack_rate",
+  "urg_rate",
+  "log_uniq_src_ip",
+  "log_uniq_dst_ip",
+  "log_uniq_dst_port",
+  "dst_port_entropy",
+  "src_ip_entropy",
+  "dst_ip_entropy",
+  "tcp_frac",
+  "udp_frac",
+  "no_reply_frac",
+  "short_flow_frac",
+  "mean_log_pkt_len",
+  "mean_log_init_win_fwd",
+  "mean_log_init_win_bwd",
+  "top_src_share",
+  "top_dst_share",
+  "log_max_src_port_fanout",
+  "log_max_src_host_fanout",
+  "wellknown_port_frac",
+  "outbound_frac",
+  "external_peer_frac"
+ ],
+ "stat_columns": [
+  "flows",
+  "packets",
+  "bytes",
+  "unique_peers",
+  "unique_dst_ports",
+  "syn_flags"
+ ],
+ "states": [
+  "NORMAL",
+  "RECONNAISSANCE",
+  "CREDENTIAL_ACCESS",
+  "EXPLOITATION",
+  "COMMAND_AND_CONTROL",
+  "INFILTRATION",
+  "IMPACT"
+ ],
+ "note": "Timestamps are UTC (local testbed time + 3 h). Ground-truth states are for display/evaluation only.",
+ "scenarios": [
+  {
+   "id": "cicids2017-monday",
+   "day": "monday",
+   "title": "CIC-IDS2017 Monday (2017-07-03)",
+   "description": "Benign traffic only - use it to see the false-alarm behaviour.",
+   "start": "2017-07-03T11:55:00Z",
+   "window_seconds": 60,
+   "n_windows": 487,
+   "hosts": [
+    {
+     "host": "192.168.10.1",
+     "role": "Gateway / firewall"
+    },
+    {
+     "host": "192.168.10.12",
+     "role": null
+    },
+    {
+     "host": "192.168.10.14",
+     "role": null
+    },
+    {
+     "host": "192.168.10.15",
+     "role": null
+    },
+    {
+     "host": "192.168.10.16",
+     "role": null
+    },
+    {
+     "host": "192.168.10.17",
+     "role": null
+    },
+    {
+     "host": "192.168.10.19",
+     "role": null
+    },
+    {
+     "host": "192.168.10.25",
+     "role": null
+    },
+    {
+     "host": "192.168.10.3",
+     "role": "Windows Server (DC / DNS)"
+    },
+    {
+     "host": "192.168.10.5",
+     "role": null
+    },
+    {
+     "host": "192.168.10.50",
+     "role": "Ubuntu web server (main attack target)"
+    },
+    {
+     "host": "192.168.10.51",
+     "role": "Ubuntu server (Heartbleed target)"
+    },
+    {
+     "host": "192.168.10.8",
+     "role": null
+    },
+    {
+     "host": "192.168.10.9",
+     "role": null
+    }
+   ],
+   "attack_minutes": {
+    "RECONNAISSANCE": 0,
+    "CREDENTIAL_ACCESS": 0,
+    "EXPLOITATION": 0,
+    "COMMAND_AND_CONTROL": 0,
+    "INFILTRATION": 0,
+    "IMPACT": 0
+   },
+   "episodes": []
+  },
+  {
+   "id": "cicids2017-tuesday",
+   "day": "tuesday",
+   "title": "CIC-IDS2017 Tuesday (2017-07-04)",
+   "description": "FTP-Patator then SSH-Patator brute force against the web server.",
+   "start": "2017-07-04T11:53:00Z",
+   "window_seconds": 60,
+   "n_windows": 488,
+   "hosts": [
+    {
+     "host": "192.168.10.1",
+     "role": "Gateway / firewall"
+    },
+    {
+     "host": "192.168.10.12",
+     "role": null
+    },
+    {
+     "host": "192.168.10.14",
+     "role": null
+    },
+    {
+     "host": "192.168.10.15",
+     "role": null
+    },
+    {
+     "host": "192.168.10.16",
+     "role": null
+    },
+    {
+     "host": "192.168.10.17",
+     "role": null
+    },
+    {
+     "host": "192.168.10.19",
+     "role": null
+    },
+    {
+     "host": "192.168.10.25",
+     "role": null
+    },
+    {
+     "host": "192.168.10.3",
+     "role": "Windows Server (DC / DNS)"
+    },
+    {
+     "host": "192.168.10.5",
+     "role": null
+    },
+    {
+     "host": "192.168.10.50",
+     "role": "Ubuntu web server (main attack target)"
+    },
+    {
+     "host": "192.168.10.51",
+     "role": "Ubuntu server (Heartbleed target)"
+    },
+    {
+     "host": "192.168.10.8",
+     "role": null
+    },
+    {
+     "host": "192.168.10.9",
+     "role": null
+    }
+   ],
+   "attack_minutes": {
+    "RECONNAISSANCE": 0,
+    "CREDENTIAL_ACCESS": 125,
+    "EXPLOITATION": 0,
+    "COMMAND_AND_CONTROL": 0,
+    "INFILTRATION": 0,
+    "IMPACT": 0
+   },
+   "episodes": [
+    {
+     "host": "192.168.10.50",
+     "state": "CREDENTIAL_ACCESS",
+     "start_index": 26,
+     "minutes": 62
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "CREDENTIAL_ACCESS",
+     "start_index": 316,
+     "minutes": 63
+    }
+   ]
+  },
+  {
+   "id": "cicids2017-wednesday",
+   "day": "wednesday",
+   "title": "CIC-IDS2017 Wednesday (2017-07-05)",
+   "description": "Staged DoS campaign (slowloris, slowhttptest, Hulk, GoldenEye) and Heartbleed.",
+   "start": "2017-07-05T11:42:00Z",
+   "window_seconds": 60,
+   "n_windows": 509,
+   "hosts": [
+    {
+     "host": "192.168.10.1",
+     "role": "Gateway / firewall"
+    },
+    {
+     "host": "192.168.10.12",
+     "role": null
+    },
+    {
+     "host": "192.168.10.14",
+     "role": null
+    },
+    {
+     "host": "192.168.10.15",
+     "role": null
+    },
+    {
+     "host": "192.168.10.16",
+     "role": null
+    },
+    {
+     "host": "192.168.10.17",
+     "role": null
+    },
+    {
+     "host": "192.168.10.19",
+     "role": null
+    },
+    {
+     "host": "192.168.10.25",
+     "role": null
+    },
+    {
+     "host": "192.168.10.3",
+     "role": "Windows Server (DC / DNS)"
+    },
+    {
+     "host": "192.168.10.5",
+     "role": null
+    },
+    {
+     "host": "192.168.10.50",
+     "role": "Ubuntu web server (main attack target)"
+    },
+    {
+     "host": "192.168.10.51",
+     "role": "Ubuntu server (Heartbleed target)"
+    },
+    {
+     "host": "192.168.10.8",
+     "role": null
+    },
+    {
+     "host": "192.168.10.9",
+     "role": null
+    }
+   ],
+   "attack_minutes": {
+    "RECONNAISSANCE": 0,
+    "CREDENTIAL_ACCESS": 0,
+    "EXPLOITATION": 0,
+    "COMMAND_AND_CONTROL": 0,
+    "INFILTRATION": 0,
+    "IMPACT": 72
+   },
+   "episodes": [
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 66,
+     "minutes": 24
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 93,
+     "minutes": 5
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 100,
+     "minutes": 8
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 110,
+     "minutes": 4
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 115,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 121,
+     "minutes": 19
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 144,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 148,
+     "minutes": 5
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 155,
+     "minutes": 3
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 342,
+     "minutes": 1
+    }
+   ]
+  },
+  {
+   "id": "cicids2017-thursday",
+   "day": "thursday",
+   "title": "CIC-IDS2017 Thursday (2017-07-06)",
+   "description": "Web brute force -> XSS -> SQL injection; afternoon infiltration of a workstation.",
+   "start": "2017-07-06T11:59:00Z",
+   "window_seconds": 60,
+   "n_windows": 486,
+   "hosts": [
+    {
+     "host": "192.168.10.1",
+     "role": "Gateway / firewall"
+    },
+    {
+     "host": "192.168.10.12",
+     "role": null
+    },
+    {
+     "host": "192.168.10.14",
+     "role": null
+    },
+    {
+     "host": "192.168.10.15",
+     "role": null
+    },
+    {
+     "host": "192.168.10.16",
+     "role": null
+    },
+    {
+     "host": "192.168.10.17",
+     "role": null
+    },
+    {
+     "host": "192.168.10.19",
+     "role": null
+    },
+    {
+     "host": "192.168.10.25",
+     "role": null
+    },
+    {
+     "host": "192.168.10.3",
+     "role": "Windows Server (DC / DNS)"
+    },
+    {
+     "host": "192.168.10.5",
+     "role": null
+    },
+    {
+     "host": "192.168.10.50",
+     "role": "Ubuntu web server (main attack target)"
+    },
+    {
+     "host": "192.168.10.51",
+     "role": "Ubuntu server (Heartbleed target)"
+    },
+    {
+     "host": "192.168.10.8",
+     "role": null
+    },
+    {
+     "host": "192.168.10.9",
+     "role": null
+    }
+   ],
+   "attack_minutes": {
+    "RECONNAISSANCE": 0,
+    "CREDENTIAL_ACCESS": 44,
+    "EXPLOITATION": 24,
+    "COMMAND_AND_CONTROL": 0,
+    "INFILTRATION": 6,
+    "IMPACT": 0
+   },
+   "episodes": [
+    {
+     "host": "192.168.10.50",
+     "state": "CREDENTIAL_ACCESS",
+     "start_index": 16,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "CREDENTIAL_ACCESS",
+     "start_index": 19,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "CREDENTIAL_ACCESS",
+     "start_index": 22,
+     "minutes": 40
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "EXPLOITATION",
+     "start_index": 76,
+     "minutes": 21
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "EXPLOITATION",
+     "start_index": 101,
+     "minutes": 3
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "INFILTRATION",
+     "start_index": 320,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "INFILTRATION",
+     "start_index": 331,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "INFILTRATION",
+     "start_index": 333,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "INFILTRATION",
+     "start_index": 335,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "INFILTRATION",
+     "start_index": 337,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "INFILTRATION",
+     "start_index": 341,
+     "minutes": 1
+    }
+   ]
+  },
+  {
+   "id": "cicids2017-friday",
+   "day": "friday",
+   "title": "CIC-IDS2017 Friday (2017-07-07)",
+   "description": "ARES botnet C2 beaconing, nmap port scans, then a LOIT DDoS.",
+   "start": "2017-07-07T11:59:00Z",
+   "window_seconds": 60,
+   "n_windows": 484,
+   "hosts": [
+    {
+     "host": "192.168.10.1",
+     "role": "Gateway / firewall"
+    },
+    {
+     "host": "192.168.10.12",
+     "role": null
+    },
+    {
+     "host": "192.168.10.14",
+     "role": null
+    },
+    {
+     "host": "192.168.10.15",
+     "role": null
+    },
+    {
+     "host": "192.168.10.16",
+     "role": null
+    },
+    {
+     "host": "192.168.10.17",
+     "role": null
+    },
+    {
+     "host": "192.168.10.19",
+     "role": null
+    },
+    {
+     "host": "192.168.10.25",
+     "role": null
+    },
+    {
+     "host": "192.168.10.3",
+     "role": "Windows Server (DC / DNS)"
+    },
+    {
+     "host": "192.168.10.5",
+     "role": null
+    },
+    {
+     "host": "192.168.10.50",
+     "role": "Ubuntu web server (main attack target)"
+    },
+    {
+     "host": "192.168.10.51",
+     "role": "Ubuntu server (Heartbleed target)"
+    },
+    {
+     "host": "192.168.10.8",
+     "role": null
+    },
+    {
+     "host": "192.168.10.9",
+     "role": null
+    }
+   ],
+   "attack_minutes": {
+    "RECONNAISSANCE": 23,
+    "CREDENTIAL_ACCESS": 0,
+    "EXPLOITATION": 0,
+    "COMMAND_AND_CONTROL": 103,
+    "INFILTRATION": 0,
+    "IMPACT": 21
+   },
+   "episodes": [
+    {
+     "host": "192.168.10.14",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 85,
+     "minutes": 5
+    },
+    {
+     "host": "192.168.10.14",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 91,
+     "minutes": 11
+    },
+    {
+     "host": "192.168.10.14",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 103,
+     "minutes": 5
+    },
+    {
+     "host": "192.168.10.14",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 109,
+     "minutes": 4
+    },
+    {
+     "host": "192.168.10.14",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 114,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.14",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 116,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.14",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 119,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.14",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 121,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 67,
+     "minutes": 5
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 73,
+     "minutes": 4
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 78,
+     "minutes": 4
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 83,
+     "minutes": 18
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 102,
+     "minutes": 6
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 109,
+     "minutes": 4
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 114,
+     "minutes": 4
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 119,
+     "minutes": 4
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 124,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 129,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 134,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 136,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 139,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 141,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 144,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 146,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 149,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 151,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 154,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 156,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 161,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 166,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 168,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 171,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 173,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 176,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 178,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 181,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 183,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 186,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 188,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 191,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 193,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 198,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 200,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 203,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 205,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 208,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 210,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 213,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 215,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 218,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 220,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 223,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 225,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 230,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 232,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 235,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 237,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.15",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 240,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.5",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 90,
+     "minutes": 3
+    },
+    {
+     "host": "192.168.10.5",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 94,
+     "minutes": 9
+    },
+    {
+     "host": "192.168.10.5",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 104,
+     "minutes": 9
+    },
+    {
+     "host": "192.168.10.5",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 114,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.5",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 116,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.5",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 119,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.5",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 121,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "RECONNAISSANCE",
+     "start_index": 246,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "RECONNAISSANCE",
+     "start_index": 296,
+     "minutes": 6
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "RECONNAISSANCE",
+     "start_index": 315,
+     "minutes": 3
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "RECONNAISSANCE",
+     "start_index": 352,
+     "minutes": 6
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "RECONNAISSANCE",
+     "start_index": 364,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "RECONNAISSANCE",
+     "start_index": 369,
+     "minutes": 3
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "RECONNAISSANCE",
+     "start_index": 383,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.50",
+     "state": "IMPACT",
+     "start_index": 417,
+     "minutes": 21
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 97,
+     "minutes": 5
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 103,
+     "minutes": 22
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 129,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 131,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 134,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 136,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 139,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 141,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 144,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 146,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 149,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 151,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 156,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 161,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 163,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 166,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 168,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 171,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 173,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 176,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 178,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 181,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 183,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 188,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 193,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 198,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 200,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 203,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 205,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 208,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 210,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 213,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 215,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 218,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 220,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 225,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 230,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 232,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 235,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 237,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.8",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 240,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 65,
+     "minutes": 3
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 69,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 72,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 74,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 77,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 79,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 82,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 84,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 87,
+     "minutes": 3
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 91,
+     "minutes": 11
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 103,
+     "minutes": 10
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 114,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 116,
+     "minutes": 2
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 119,
+     "minutes": 1
+    },
+    {
+     "host": "192.168.10.9",
+     "state": "COMMAND_AND_CONTROL",
+     "start_index": 121,
+     "minutes": 2
+    }
+   ]
+  }
+ ]
+}
