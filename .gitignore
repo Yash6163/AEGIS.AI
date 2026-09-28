@@ -34,3 +34,4 @@ coverage/
 *.pem
 .claude/settings.local.json
 frontend/.next-build/
+data/raw_ext/

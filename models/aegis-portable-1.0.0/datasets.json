@@ -1,0 +1,175 @@
+{
+ "features": [
+  "log_flows",
+  "log_total_pkts",
+  "log_fwd_bytes",
+  "log_bwd_bytes",
+  "log_bwd_fwd_byte_ratio",
+  "mean_log_duration",
+  "std_log_duration",
+  "mean_log_bytes_per_pkt",
+  "no_reply_frac",
+  "short_flow_frac",
+  "tcp_frac",
+  "udp_frac",
+  "icmp_frac",
+  "log_uniq_src_ip",
+  "log_uniq_dst_ip",
+  "log_uniq_dst_port",
+  "dst_port_entropy",
+  "src_ip_entropy",
+  "dst_ip_entropy",
+  "top_src_share",
+  "top_dst_share",
+  "log_max_src_port_fanout",
+  "log_max_src_host_fanout",
+  "wellknown_port_frac",
+  "outbound_frac",
+  "external_peer_frac"
+ ],
+ "cic_full_features": [
+  "log_flows",
+  "log_fwd_pkts",
+  "log_bwd_pkts",
+  "log_fwd_bytes",
+  "log_bwd_bytes",
+  "log_bwd_fwd_pkt_ratio",
+  "mean_log_duration",
+  "std_log_duration",
+  "mean_log_iat_mean",
+  "mean_log_iat_std",
+  "mean_log_iat_max",
+  "syn_rate",
+  "fin_rate",
+  "rst_rate",
+  "psh_rate",
+  "ack_rate",
+  "urg_rate",
+  "log_uniq_src_ip",
+  "log_uniq_dst_ip",
+  "log_uniq_dst_port",
+  "dst_port_entropy",
+  "src_ip_entropy",
+  "dst_ip_entropy",
+  "tcp_frac",
+  "udp_frac",
+  "no_reply_frac",
+  "short_flow_frac",
+  "mean_log_pkt_len",
+  "mean_log_init_win_fwd",
+  "mean_log_init_win_bwd",
+  "top_src_share",
+  "top_dst_share",
+  "log_max_src_port_fanout",
+  "log_max_src_host_fanout",
+  "wellknown_port_frac",
+  "outbound_frac",
+  "external_peer_frac"
+ ],
+ "states": [
+  "NORMAL",
+  "RECONNAISSANCE",
+  "CREDENTIAL_ACCESS",
+  "EXPLOITATION",
+  "COMMAND_AND_CONTROL",
+  "INFILTRATION",
+  "IMPACT"
+ ],
+ "datasets": {
+  "darpa2000": {
+   "flows": 125599,
+   "rows": 5655,
+   "hosts": 29,
+   "segments": [
+    "darpa2000-lldos1"
+   ],
+   "internal_networks": "172.16.0.0/16",
+   "description": "DARPA 2000 LLDOS 1.0 (inside sensor), 5-phase DDoS kill chain, from PCAP",
+   "state_minutes": {
+    "NORMAL": 5610,
+    "RECONNAISSANCE": 28,
+    "EXPLOITATION": 4,
+    "INFILTRATION": 3,
+    "IMPACT": 10
+   }
+  },
+  "unsw": {
+   "flows": 2540047,
+   "rows": 41300,
+   "hosts": 56,
+   "segments": [
+    "unsw-capture1",
+    "unsw-capture2"
+   ],
+   "internal_networks": "149.171.126.0/24,59.166.0.0/24",
+   "description": "UNSW-NB15 (UNSW Canberra Cyber Range, IXIA PerfectStorm), 2 captures",
+   "state_minutes": {
+    "NORMAL": 33765,
+    "RECONNAISSANCE": 2342,
+    "CREDENTIAL_ACCESS": 557,
+    "EXPLOITATION": 4531,
+    "IMPACT": 105
+   }
+  },
+  "ctu13": {
+   "flows": 5474539,
+   "rows": 59893,
+   "hosts": 323,
+   "segments": [
+    "ctu13-s43",
+    "ctu13-s45",
+    "ctu13-s46",
+    "ctu13-s47",
+    "ctu13-s48",
+    "ctu13-s51",
+    "ctu13-s52",
+    "ctu13-s53"
+   ],
+   "internal_networks": "147.32.84.0/24",
+   "description": "CTU-13 botnet captures (scenarios 43,45-48,51-53)",
+   "state_minutes": {
+    "NORMAL": 59173,
+    "RECONNAISSANCE": 54,
+    "COMMAND_AND_CONTROL": 132,
+    "IMPACT": 534
+   }
+  },
+  "cic2017": {
+   "flows": 2830743,
+   "rows": 34356,
+   "hosts": 70,
+   "segments": [
+    "cic2017-friday",
+    "cic2017-monday",
+    "cic2017-thursday",
+    "cic2017-tuesday",
+    "cic2017-wednesday"
+   ],
+   "internal_networks": "192.168.10.0/24",
+   "description": "CIC-IDS2017, 5 days, 14 LAN hosts",
+   "state_minutes": {
+    "NORMAL": 33782,
+    "RECONNAISSANCE": 23,
+    "CREDENTIAL_ACCESS": 169,
+    "EXPLOITATION": 24,
+    "COMMAND_AND_CONTROL": 259,
+    "INFILTRATION": 6,
+    "IMPACT": 93
+   }
+  },
+  "cic2018": {
+   "flows": 7948748,
+   "rows": 332640,
+   "hosts": 462,
+   "segments": [
+    "cic2018-tue-20-02"
+   ],
+   "internal_networks": "172.31.0.0/16",
+   "description": "CSE-CIC-IDS2018 20-Feb-2018 (AWS; DDoS LOIC-HTTP/UDP)",
+   "state_minutes": {
+    "NORMAL": 332560,
+    "IMPACT": 80
+   }
+  }
+ }
+}

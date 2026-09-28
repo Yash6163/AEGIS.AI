@@ -68,7 +68,7 @@ def train_world_model(seed: int, train: D.SequenceSet, val: D.SequenceSet, verbo
     """Returns (model, best_val_loss, best_epoch)."""
     torch.manual_seed(seed)
     rng = np.random.default_rng(seed)
-    model = AttackWorldModel(len(FEATURE_NAMES), NUM_STATES, HIDDEN, STATE_EMB, DROPOUT, INPUT_CLIP)
+    model = AttackWorldModel(train.X.shape[-1], NUM_STATES, HIDDEN, STATE_EMB, DROPOUT, INPUT_CLIP)
     opt = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
     w = class_weights(train.y)
     Xtr, ytr = torch.tensor(train.X), torch.tensor(train.y)

@@ -178,6 +178,33 @@ How to read these numbers:
   periodic botnet beacons). Lead-time numbers are reported separately for cold onsets,
   which traffic alone largely cannot predict.
 
+### Multi-dataset evaluation (portable 26-feature model)
+
+Five public datasets, 18.9 M flows, 473,844 host-minutes. Full numbers are in
+`models/aegis-wm-1.1.0/metrics_multi.json`; download and run commands are in
+[ml/README.md](ml/README.md). Early warning = P(attack within 5 min), threshold chosen
+for F0.5 on the validation fold.
+
+| dataset | model | AUROC | AUPRC | precision | recall | F0.5 |
+|---|---|---|---|---|---|---|
+| CIC-IDS2017 | single-dataset | 0.873 | 0.435 | 67 % | 28 % | 0.529 |
+| CIC-IDS2017 | joint (3 datasets) | 0.800 | 0.369 | 81 % | 26 % | 0.569 |
+| UNSW-NB15 | single-dataset | 0.997 | 0.990 | 100 % | 98 % | 0.994 |
+| UNSW-NB15 | joint | 0.998 | 0.991 | 100 % | 97 % | 0.992 |
+| CTU-13 | single-dataset | 0.843 | 0.409 | 57 % | 37 % | 0.514 |
+| CTU-13 | joint | 0.852 | 0.507 | 84 % | 35 % | 0.659 |
+
+* Joint training raises warning precision and F0.5 on CIC-IDS2017 and CTU-13. It lowers
+  AUROC on CIC-IDS2017. XGBoost on the same features is close behind; see the JSON.
+* UNSW-NB15 is near-saturated for every model. Its attacks are loud and easy to separate.
+* **Zero-shot transfer fails.**
+  * Leave-one-dataset-out AUROC is 0.60 (CIC-IDS2017), 0.14 (UNSW-NB15) and 0.41 (CTU-13).
+  * On DARPA 2000, built from raw PCAP, the shipped models are at chance: AUROC 0.48–0.60, and none of the 42 onsets is warned.
+  * On CSE-CIC-IDS2018 (20-Feb), AUROC is 0.95, but AUPRC is only 0.12 (80 attack minutes out of 332,640).
+  * Unsupervised per-network self-standardisation did not fix this. It helped DARPA AUROC slightly and hurt IDS2018.
+
+  A new network needs some labelled local data to fine-tune on.
+
 ## 6. Risk, uncertainty, explanations
 
 | quantity | kind | meaning |
@@ -374,10 +401,11 @@ model, write a new `models/<version>/` directory and point `MODEL_DIR` at it.
 
 ## 17. Limitations
 
-* **One dataset, one lab network.** Everything is trained and evaluated on CIC-IDS2017
-  (14 hosts, 5 days, scripted attacks). Blocked CV still shares *campaigns* across folds.
-  Performance on a different network is unknown, and the OOD flag is only a heuristic
-  warning.
+* **Lab networks only.**
+  * The production model is trained on CIC-IDS2017 (14 hosts, 5 days, scripted attacks), and blocked CV still shares *campaigns* across folds.
+  * The portable model adds UNSW-NB15 and CTU-13.
+  * Zero-shot transfer to unseen networks (DARPA 2000, CSE-CIC-IDS2018, leave-one-dataset-out) is poor; see the multi-dataset results.
+  * The OOD flag is only a heuristic warning.
 * **Scripted attack schedule.** Transitions between attack types follow the dataset
   authors' timetable, not real adversary decision-making. The model learns campaign
   dynamics (continuation, pauses, periodic beacons, escalation within a campaign), not
@@ -388,8 +416,9 @@ model, write a new `models/<version>/` directory and point `MODEL_DIR` at it.
   from traffic alone. Lead time comes mostly from within-campaign forecasting.
 * **False warnings** exist at the chosen operating point (see RESULTS). The threshold
   is a documented trade-off.
-* **No live capture.** Replay is recorded traffic, clearly labelled. Uploads must be
-  CICFlowMeter-style flow CSVs; there is no PCAP/NetFlow ingestion yet.
+* **No live capture.** Replay is recorded traffic, clearly labelled.
+  * Supported uploads: CICFlowMeter CSV, Argus/CTU binetflow, UNSW-NB15 CSV, and libpcap `.pcap` (pcapng is not supported).
+  * PCAP flows are built by a simple pure-Python flow builder, not CICFlowMeter. Non-CIC formats use the portable model.
 * **Risk score and severities are policy**, not learned.
 * **Security**: a single shared API key, no user accounts, a single-node audit chain,
   and per-process rate limiting.

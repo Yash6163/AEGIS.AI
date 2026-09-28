@@ -84,9 +84,9 @@ class SequenceSet:
         return SequenceSet(self.X[mask], self.y[mask], self.idx[mask])
 
 
-def standardiser(windows: pd.DataFrame, folds: list[int]) -> tuple[np.ndarray, np.ndarray]:
+def standardiser(windows: pd.DataFrame, folds: list[int], features: list[str] = FEATURE_NAMES) -> tuple[np.ndarray, np.ndarray]:
     """Feature mean/std fitted on the given (training) folds only."""
-    train = windows.loc[windows["fold"].isin(folds), FEATURE_NAMES].to_numpy(np.float64)
+    train = windows.loc[windows["fold"].isin(folds), features].to_numpy(np.float64)
     mean = train.mean(0)
     std = train.std(0)
     std[std < 1e-6] = 1.0
@@ -99,15 +99,16 @@ def build_sequences(
     std: np.ndarray,
     history: int = HISTORY,
     horizon: int = MAX_HORIZON,
+    features: list[str] = FEATURE_NAMES,
 ) -> SequenceSet:
     """Samples for every (host, t) whose history and targets stay in one block.
 
     `windows` must be sorted by (day, entity, window_start) with contiguous
     per-host minutes (prepare_windows.py guarantees this).
     """
-    feats = ((windows[FEATURE_NAMES].to_numpy(np.float32) - mean) / std).astype(np.float32)
+    feats = ((windows[features].to_numpy(np.float32) - mean) / std).astype(np.float32)
     states = windows["state"].to_numpy(np.int64)
-    seg = pd.factorize(windows["block"].astype(str) + "|" + windows["entity"].astype(str))[0]
+    seg = pd.factorize(windows["block"].astype(str) + "|" + windows["day"].astype(str) + "|" + windows["entity"].astype(str))[0]
     n = len(windows)
     starts = np.arange(history - 1, n)
     t_idx = starts[seg[starts - history + 1] == seg[starts]]

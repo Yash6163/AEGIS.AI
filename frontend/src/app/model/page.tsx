@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { PageHeader } from "@/components/Shell";
 import { ConfusionMatrix, HBars, LineChart, Reliability } from "@/components/charts/charts";
+import { MultiDataset } from "@/components/MultiDataset";
 import { Card, ErrorState, Pill, Segmented, Skeleton, StateChip, useApi } from "@/components/ui";
 import type { StateName } from "@/lib/api";
 import { STATE_SHORT, num, pct } from "@/lib/states";
@@ -215,6 +216,8 @@ export default function ModelPage() {
           {!d ? <Skeleton className="h-48" /> : <Reliability bins={d.world_model_detail[k].reliability} />}
         </Card>
       </div>
+
+      <MultiDataset />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Global feature importance" subtitle={d ? `Permutation importance: increase in ${d.permutation_importance.target} when a feature is shuffled across test samples (mean of 5 folds).` : undefined}>

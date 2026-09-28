@@ -23,7 +23,7 @@ def make_settings(tmp_path, **kw) -> Settings:
     base = dict(app_env="test", database_url=f"sqlite:///{tmp_path / 'test.db'}", log_json=False, log_level="WARNING",
                 rate_limit_per_minute=0, mc_samples=128, max_upload_mb=5, max_uncompressed_mb=20)
     base.update(kw)
-    return Settings(**base)
+    return Settings(_env_file=None, **base)  # never read a developer's local .env
 
 
 @pytest.fixture

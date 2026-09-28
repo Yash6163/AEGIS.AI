@@ -1,7 +1,8 @@
 """Safe handling of uploaded flow files (treated as untrusted input).
 
-* Only CICFlowMeter-style CSV (.csv) or gzip-compressed CSV (.csv.gz).
-  No pickle, parquet, Excel or archives with multiple members are accepted.
+* Flow CSVs (.csv / .csv.gz / .binetflow: CICFlowMeter, Argus/CTU-13
+  binetflow, UNSW-NB15) and libpcap captures (.pcap / .pcap.gz / .cap).
+  No pickle, parquet, pcapng, Excel or multi-member archives are accepted.
 * The client filename is never used as a path; it is sanitised for display
   only. Data is streamed to an anonymous temporary file with a hard byte
   limit, and gzip input is decompressed through a counting reader that aborts
@@ -24,12 +25,14 @@ from typing import BinaryIO
 
 import pandas as pd
 
-from ..forecasting.features import COLUMN_ALIASES, FlowSchemaError, _key, resolve_columns
+from ..forecasting.features import FlowSchemaError, _key
+from .formats import ALLOWED_KEYS
+from .pcap import PcapError, read_pcap_flows
 
-ALLOWED_SUFFIXES = (".csv", ".csv.gz")
+ALLOWED_SUFFIXES = (".csv", ".csv.gz", ".binetflow", ".pcap", ".pcap.gz", ".cap")
+PCAP_SUFFIXES = (".pcap", ".pcap.gz", ".cap")
 GZIP_MAGIC = b"\x1f\x8b"
 _SAFE = re.compile(r"[^A-Za-z0-9._-]+")
-_ALLOWED_KEYS = {_key(a) for aliases in COLUMN_ALIASES.values() for a in aliases}
 
 
 class UploadError(ValueError):
@@ -50,7 +53,7 @@ def check_suffix(name: str) -> str:
     for suffix in sorted(ALLOWED_SUFFIXES, key=len, reverse=True):
         if lower.endswith(suffix):
             return suffix
-    raise UploadError("only .csv or .csv.gz flow files are accepted", 415)
+    raise UploadError("accepted: flow CSV (.csv, .csv.gz, .binetflow) or libpcap capture (.pcap, .pcap.gz)", 415)
 
 
 @dataclass
@@ -115,7 +118,7 @@ class _LimitedReader(io.RawIOBase):
 def read_flow_csv(stored: StoredUpload, suffix: str, max_uncompressed: int, max_rows: int) -> pd.DataFrame:
     if suffix == ".csv.gz" and not stored.compressed:
         raise UploadError("file has .gz extension but is not gzip data", 415)
-    if suffix == ".csv" and stored.compressed:
+    if suffix in (".csv", ".binetflow") and stored.compressed:
         raise UploadError("gzip data must use the .csv.gz extension", 415)
     raw: BinaryIO = gzip.open(stored.path, "rb") if stored.compressed else stored.path.open("rb")
     try:
@@ -127,7 +130,7 @@ def read_flow_csv(stored: StoredUpload, suffix: str, max_uncompressed: int, max_
         try:
             df = pd.read_csv(
                 text,
-                usecols=lambda c: _key(c) in _ALLOWED_KEYS,
+                usecols=lambda c: _key(c) in ALLOWED_KEYS,
                 nrows=max_rows + 1,
                 low_memory=False,
                 on_bad_lines="error",
@@ -141,10 +144,22 @@ def read_flow_csv(stored: StoredUpload, suffix: str, max_uncompressed: int, max_
     if len(df) > max_rows:
         raise UploadError(f"file has more than {max_rows:,} rows", 413)
     df.columns = [str(c).strip() for c in df.columns]
-    resolve_columns(list(df.columns))  # raises FlowSchemaError naming the missing columns
+    if len(df.columns) == 0:
+        raise FlowSchemaError("missing required columns: no CICFlowMeter, binetflow or UNSW-NB15 flow columns found")
     if df.empty:
         raise UploadError("CSV contains no rows")
     return df
 
 
-__all__ = ["UploadError", "FlowSchemaError", "sanitize_filename", "check_suffix", "store_stream", "read_flow_csv", "StoredUpload"]
+def read_pcap(stored: StoredUpload, suffix: str, max_packets: int) -> tuple[pd.DataFrame, dict]:
+    if suffix == ".pcap.gz" and not stored.compressed:
+        raise UploadError("file has .gz extension but is not gzip data", 415)
+    try:
+        return read_pcap_flows(stored.path, max_packets=max_packets)
+    except PcapError as exc:
+        raise UploadError(str(exc), 415) from exc
+    except (OSError, EOFError) as exc:  # corrupt gzip stream
+        raise UploadError(f"unreadable capture: {str(exc)[:200]}", 415) from exc
+
+
+__all__ = ["read_pcap", "PCAP_SUFFIXES", "UploadError", "FlowSchemaError", "sanitize_filename", "check_suffix", "store_stream", "read_flow_csv", "StoredUpload"]
