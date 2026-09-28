@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     log_json: bool = True
 
     database_url: str = f"sqlite:///{REPO_ROOT / 'aegis.db'}"
-    model_dir: Path = REPO_ROOT / "models" / "aegis-wm-1.0.0"
+    model_dir: Path = REPO_ROOT / "models" / "aegis-wm-1.1.0"
     scenario_path: Path = REPO_ROOT / "data" / "scenarios" / "cicids2017_replay.npz"
     upload_tmp_dir: Path | None = None  # None -> system temp dir
 

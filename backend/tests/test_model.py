@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from aegis.forecasting.risk import assess, first_hit, risk_level
-from aegis.forecasting.runtime import ArtifactError, WorldModelRuntime
+from aegis.forecasting.runtime import ArtifactError, EnsembleRuntime, load_runtime
 
 from .conftest import MODEL_DIR
 
@@ -66,12 +66,12 @@ def test_forecast_rejects_wrong_feature_count(engine):
 def test_artifact_checksum_is_enforced(tmp_path):
     d = tmp_path / "m"
     shutil.copytree(MODEL_DIR, d, ignore=shutil.ignore_patterns("cv"))
-    WorldModelRuntime.load(d)
+    load_runtime(d)
     manifest = json.loads((d / "manifest.json").read_text())
     manifest["weights_sha256"] = "0" * 64
     (d / "manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ArtifactError, match="checksum"):
-        WorldModelRuntime.load(d)
+        load_runtime(d)
 
 
 def test_pickled_weights_are_refused(tmp_path):
@@ -80,14 +80,14 @@ def test_pickled_weights_are_refused(tmp_path):
     shutil.copytree(MODEL_DIR, d, ignore=shutil.ignore_patterns("cv"))
     with np.load(d / "weights.npz") as z:
         arrays = {k: z[k] for k in z.files}
-    arrays["inp_w"] = np.array([object()], dtype=object)
+    arrays[sorted(arrays)[0]] = np.array([object()], dtype=object)
     np.savez(d / "weights.npz", **arrays)
     import hashlib
     manifest = json.loads((d / "manifest.json").read_text())
     manifest["weights_sha256"] = hashlib.sha256((d / "weights.npz").read_bytes()).hexdigest()
     (d / "manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError):
-        WorldModelRuntime.load(d)
+        load_runtime(d)
 
 
 def test_risk_levels_and_first_hit():
@@ -117,7 +117,8 @@ def test_torch_parity():
     sys.path.insert(0, str(REPO_ROOT / "ml"))
     from model import AttackWorldModel
 
-    rt = WorldModelRuntime.load(MODEL_DIR)
+    loaded = load_runtime(MODEL_DIR)
+    rt = loaded.members[0] if isinstance(loaded, EnsembleRuntime) else loaded
     m = AttackWorldModel(len(rt.mean), rt.n_states, hidden=rt.weights["enc_w_hh"].shape[1],
                          state_emb=rt.weights["emb"].shape[1], input_clip=float(rt.manifest.get("input_clip", 0)))
     sd = m.state_dict()
@@ -131,3 +132,35 @@ def test_torch_parity():
     with torch.no_grad():
         h_t = m.encode(torch.tensor(x, dtype=torch.float32)).numpy()
     np.testing.assert_allclose(h_t, rt.encode(x), atol=1e-4)
+
+
+def test_ensemble_is_a_proper_mixture():
+    """An ensemble of identical members must reproduce the single model, and a
+    mixed ensemble's exact marginals must be the member average."""
+    loaded = load_runtime(MODEL_DIR)
+    single = loaded.members[0] if isinstance(loaded, EnsembleRuntime) else loaded
+    twin = EnsembleRuntime([single, single], single.manifest)
+    x = single.standardise(np.random.default_rng(0).normal(size=(6, single.history, len(single.mean))) * single.std + single.mean)
+    p0a, p1a = single.next_state_exact(single.encode(x))
+    p0b, p1b = twin.next_state_exact(twin.encode(x))
+    np.testing.assert_allclose(p0a, p0b, atol=1e-12)
+    np.testing.assert_allclose(p1a, p1b, atol=1e-12)
+    r = twin.rollout(x, 4, n_samples=101, seed=2)
+    assert r.paths.shape == (6, 101, 5)
+    np.testing.assert_allclose(r.marginals.sum(-1), 1.0, atol=1e-9)
+    if isinstance(loaded, EnsembleRuntime) and len(loaded.members) > 1:
+        m = loaded.members
+        h = loaded.encode(x)
+        want = np.mean([mm.next_state_exact(hh, loaded.temperature)[1] for mm, hh in zip(m, h, strict=True)], axis=0)
+        np.testing.assert_allclose(loaded.next_state_exact(h)[1], want, atol=1e-12)
+
+
+def test_exact_attack_probability_matches_monte_carlo(engine):
+    rng = np.random.default_rng(5)
+    x = engine.rt.standardise(np.stack([_hist(engine, rng) for _ in range(6)]) * 1.5)
+    h = engine.rt.encode(x)
+    exact = engine.rt.attack_within_exact(h, 5)
+    r = engine.rt.rollout(x, 5, 20000, seed=3, h0=h)
+    mc = (r.paths[:, :, 1:6] != 0).any(axis=2).mean(axis=1)
+    assert np.all((exact >= 0) & (exact <= 1))
+    assert np.abs(exact - mc).max() < 0.02

@@ -13,18 +13,18 @@ early warning when the sampled trajectories converge on an attack or compromise 
 
 | metric | world model (ours) | best deployable baseline |
 |---|---:|---:|
-| **Early warning** (any attack within 5 min), AUROC |  **0.888** | 0.866 (XGBoost) |
-| early warning, AUPRC |  0.312 | **0.378** (XGBoost) |
-| early warning at the validated threshold, F0.5 |  0.361 | **0.369** (XGBoost) |
-| early warning at the validated threshold, F1 |  0.382 | **0.388** (Markov) |
-| early warning at the validated threshold, F2 |  0.405 | **0.410** (Markov) |
-| **State 5 min ahead**, macro-F1 (7 states) |  **0.286** | 0.235 (XGBoost) |
-| attack 5 min ahead, precision |  0.292 | **0.786** (Random forest) |
-| attack 5 min ahead, recall |  **0.359** | 0.218 (Markov) |
-| attack 5 min ahead, F0.5 |  0.304 | **0.437** (XGBoost) |
-| attack 5 min ahead, F2 |  **0.343** | 0.248 (Markov) |
+| **Early warning** (any attack within 5 min), AUROC |  **0.879** | 0.866 (XGBoost) |
+| early warning, AUPRC |  **0.432** | 0.421 (Markov) |
+| early warning at the validated threshold, F0.5 |  **0.576** | 0.521 (Markov) |
+| early warning at the validated threshold, F1 |  **0.433** | 0.394 (Markov) |
+| early warning at the validated threshold, F2 |  **0.347** | 0.317 (Markov) |
+| **State 5 min ahead**, macro-F1 (7 states) |  **0.288** | 0.235 (XGBoost) |
+| attack 5 min ahead, precision |  0.697 | **0.846** (Markov) |
+| attack 5 min ahead, recall |  **0.266** | 0.183 (XGBoost) |
+| attack 5 min ahead, F0.5 |  **0.527** | 0.437 (XGBoost) |
+| attack 5 min ahead, F2 |  **0.304** | 0.214 (XGBoost) |
 
-**In one line:** the world model ranks risk better (AUROC) and forecasts the future state better across all seven states (macro-F1, attack recall, F2 at +5 min), but it is less precise: precision-weighted scores (AUPRC, F0.5) and the thresholded early-warning F-scores are equal to or slightly worse than simple baselines. 25% of 85 attack onsets were warned about before they began, at 1.23 false warnings per host-hour. See [Limitations](#17-limitations).
+**Summary (generated):** the world model is best on 9 of 10 rows; a baseline is better on: attack precision at +5 min. 14% of 85 attack onsets were warned about before they began, at 0.16 false warnings per host-hour. See [Limitations](#17-limitations).
 <!-- HEADLINE:END -->
 
 Every number in this repository is produced by a script from out-of-fold predictions
@@ -66,7 +66,7 @@ For every internal host, every minute:
    attack, model confidence, an uncertainty flag, an out-of-distribution flag, and a
    policy risk score.
 5. **Warn**: raise an alert when P(attack within 5 min) crosses a threshold chosen on
-   validation data (false-alarm target ≤ 2 %), once per episode with a per-host cooldown.
+   validation data to maximise F0.5 (precision weighted twice as much as recall), once per episode with a per-host cooldown.
 6. **Explain**: show observed evidence (z-scores), occlusion attribution per feature and
    per history minute, and log the alert to a SHA-256 hash-chained audit log.
 
@@ -104,7 +104,7 @@ or any claim of performance on networks unlike CIC-IDS2017 without retraining.
 | `backend/aegis/api/` | FastAPI routers, middleware, dependencies |
 | `backend/migrations/` | Alembic migrations |
 | `frontend/` | Next.js 14 SOC console |
-| `models/aegis-wm-1.0.0/` | production artifact, 5 cross-validation fold models, `metrics.json` |
+| `models/aegis-wm-1.1.0/` | production artifact, 5 cross-validation fold models, `metrics.json` |
 | `data/scenarios/` | per-host window features of the five capture days (replay), 3 MB |
 | `data/samples/` | a real 75-minute CIC-IDS2017 flow file for trying uploads |
 | `docs/` | [audit of the original prototype](docs/AUDIT.md), [methodology](docs/METHODOLOGY.md), [results](docs/RESULTS.md), [state mapping](docs/STATE_MAPPING.md), [security](docs/SECURITY.md) |
@@ -122,8 +122,12 @@ Full detail: [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
   `GRUCell` transition advances the latent state conditioned on the previous attack
   state, and a shared decoder emits the state distribution. It is trained by maximum
   likelihood over `S_t…S_{t+10}` (teacher forcing) and rolled out by ancestral sampling.
-  The model has about 20 k parameters. A small recurrent model fits the data size, and a
-  Transformer was not justified.
+  Production uses an equal-weight **ensemble of 5 such models** (different seeds; samples
+  are split across members, so every output is a proper mixture). Each member has about
+  44 k parameters. P(attack within K) is computed exactly (a single all-NORMAL path per
+  current state); trajectory trees and compromise probability are sampled. A small recurrent model fits the data size, and a Transformer was not
+  justified. Training uses plain maximum likelihood: class re-weighting was tried and
+  rejected on validation data because it lowered precision without improving macro-F1.
 * **Evaluation**: 5-fold **blocked** cross-validation with 30-minute blocks, where
   sequences never cross a block boundary, so no traffic minute or label is shared
   between train and test. Hyper-parameters, early stopping, temperature and the warning
@@ -139,10 +143,10 @@ Full detail: [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
 <!-- RESULTS:START -->
 | model | now | +1 min | +3 min | +5 min | +10 min |
 |---|---:|---:|---:|---:|---:|
-| **World model (ours)** | 0.380 | 0.340 | 0.306 | 0.286 | 0.231 |
+| **World model (ours)** | 0.358 | 0.324 | 0.301 | 0.288 | 0.189 |
 | XGBoost, direct per horizon | 0.388 | 0.302 | 0.264 | 0.235 | 0.183 |
 | Random forest, direct per horizon | 0.326 | 0.257 | 0.246 | 0.228 | 0.174 |
-| Markov chain on nowcast | 0.380 | 0.308 | 0.286 | 0.222 | 0.190 |
+| Markov chain on nowcast | 0.358 | 0.329 | 0.312 | 0.215 | 0.177 |
 | Always NORMAL | 0.142 | 0.142 | 0.142 | 0.142 | 0.142 |
 | Persistence, true current state *(oracle)* | 1.000 | 0.717 | 0.627 | 0.615 | 0.528 |
 | Markov, true current state *(oracle)* | 1.000 | 0.545 | 0.403 | 0.339 | 0.251 |
@@ -158,12 +162,16 @@ How to read these numbers:
 * The oracle baselines see the true current state. Forecasting "the state will stay as
   it is" from perfect knowledge of the present is a strong upper reference that no
   deployable model has.
-* **The trade-off is recall versus precision.** The world model finds far more of the
-  future attack minutes (attack recall) and ranks risk better (AUROC), but when it
-  predicts an attack it is right less often than the tree baselines, which rarely
-  predict attacks at all. On the minutes where a host's state *changes*, no deployable
-  model, ours included, beats trivial baselines by a meaningful margin. See the
-  attack-precision, F-beta and state-change tables in [RESULTS.md](docs/RESULTS.md).
+* **v1.1.0 sits at a precision-weighted operating point** (no class re-weighting, F0.5 warning
+  threshold). It is best on the early-warning metrics and on the +5 min forecast, but not on
+  everything:
+  * current-state detection ("now") is below XGBoost;
+  * at +1/+3 min, a Markov chain applied to *our own* nowcast is marginally ahead on
+    macro-F1, F0.5 and Brier;
+  * tree models and the Markov chain are more precise at most horizons because they
+    rarely predict an attack, and they miss far more attacks;
+  * compared with v1.0.0, it raises 7x fewer false warnings but warns before fewer onsets.
+  These are real trade-offs, not tuning gaps. All tables are in [RESULTS.md](docs/RESULTS.md).
 * EXPLOITATION and INFILTRATION each occur as a single short episode in the whole
   dataset (17 and 2 test host-minutes). Per-class scores for them are not meaningful.
 * Most attack onsets in CIC-IDS2017 are re-onsets within a running campaign (e.g.
@@ -282,11 +290,11 @@ non-root, read-only filesystem) and the web console on http://localhost:3000. On
 console port is published. Images are multi-stage, and the backend image contains no
 training dependencies.
 
-> Note: the Dockerfiles and compose file were written and reviewed, and every step they
-> run was verified natively (clean-venv install from the pinned requirements, Alembic on
-> PostgreSQL, the production-mode API, the Next.js standalone server). **Docker itself
-> was not available on the build machine, so `docker compose up` has not been executed.**
-> CI builds both images.
+> Verified on macOS (Colima, Docker 29): both images build, `docker compose up` brings
+> all three services to *healthy*, Alembic migrates Postgres, and an end-to-end run through
+> the console proxy works: readiness, sample upload, replay stream with alerts, and audit-chain
+> verification. The API runs in production mode (`/docs` off) as a non-root user on a
+> read-only filesystem. Image sizes: backend ≈ 630 MB, frontend ≈ 225 MB.
 
 ## 13. Configuration
 
@@ -299,7 +307,7 @@ Backend (environment or `.env`; see `.env.example`):
 | `SECRET_KEY` | dev placeholder | keys the HMAC for IP pseudonymisation |
 | `API_KEY` | unset | required header `X-API-Key` for writes |
 | `CORS_ORIGINS` | `http://localhost:3000` | comma-separated |
-| `MODEL_DIR` | `models/aegis-wm-1.0.0` | artifact directory (manifest + weights + cv/ + metrics) |
+| `MODEL_DIR` | `models/aegis-wm-1.1.0` | artifact directory (manifest + weights + cv/ + metrics) |
 | `SCENARIO_PATH` | `data/scenarios/cicids2017_replay.npz` | replay bundle |
 | `LOG_LEVEL`, `LOG_JSON` | `INFO`, `true` | structured JSON logs with request ids |
 | `RATE_LIMIT_PER_MINUTE` | 240 | per client, 0 disables |
@@ -311,7 +319,7 @@ Frontend (server-side only): `BACKEND_URL`, `API_KEY`.
 ## 14. Tests & CI
 
 ```bash
-cd backend && pytest -q          # 50 tests: features, labels, runtime, parity, risk, API, upload security, audit tampering
+cd backend && pytest -q          # 53 tests: features, labels, runtime, parity, risk, API, upload security, audit tampering
 cd frontend && npm test          # component, API-client, loading/error-state tests
 cd frontend && npm run lint && npm run typecheck && npm run build
 ```
@@ -331,7 +339,7 @@ mkdir -p data/raw && for f in Monday-WorkingHours Tuesday-WorkingHours Wednesday
     "https://huggingface.co/datasets/bvsam/cic-ids-2017/resolve/main/traffic_labels/$f.pcap_ISCX.csv.parquet"; done
 python ml/prepare_windows.py     # -> data/processed/windows.parquet (host x minute table)
 python ml/tune.py                # optional: hyper-parameter search on validation folds
-python ml/train.py               # -> models/aegis-wm-1.0.0/{weights.npz,manifest.json}
+python ml/train.py               # -> models/aegis-wm-1.1.0/{weights.npz,manifest.json}
 python ml/evaluate.py            # 5-fold CV + baselines -> metrics.json, cv/fold*/
 python ml/build_scenarios.py     # -> data/scenarios (replay bundle)
 python ml/report.py              # -> docs/RESULTS.md

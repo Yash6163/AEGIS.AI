@@ -1,0 +1,7 @@
+{"CLASS_WEIGHT_POWER": 0.0, "DROPOUT": 0.2, "attack_f05_k1": 0.703, "f1_k0": 0.489, "f1_k1": 0.458, "ew_auprc": 0.548, "epoch": 8.0} (136s)
+{"CLASS_WEIGHT_POWER": 0.0, "DROPOUT": 0.4, "attack_f05_k1": 0.737, "f1_k0": 0.493, "f1_k1": 0.46, "ew_auprc": 0.548, "epoch": 9.4} (175s)
+{"CLASS_WEIGHT_POWER": 0.25, "DROPOUT": 0.2, "attack_f05_k1": 0.655, "f1_k0": 0.465, "f1_k1": 0.434, "ew_auprc": 0.471, "epoch": 8.6} (179s)
+{"CLASS_WEIGHT_POWER": 0.25, "DROPOUT": 0.4, "attack_f05_k1": 0.694, "f1_k0": 0.462, "f1_k1": 0.43, "ew_auprc": 0.509, "epoch": 9.2} (186s)
+{"CLASS_WEIGHT_POWER": 0.5, "DROPOUT": 0.2, "attack_f05_k1": 0.552, "f1_k0": 0.419, "f1_k1": 0.396, "ew_auprc": 0.469, "epoch": 11.8} (174s)
+{"CLASS_WEIGHT_POWER": 0.5, "DROPOUT": 0.4, "attack_f05_k1": 0.565, "f1_k0": 0.426, "f1_k1": 0.411, "ew_auprc": 0.484, "epoch": 12.0} (187s)
+best: {'config': {'CLASS_WEIGHT_POWER': 0.0, 'DROPOUT': 0.4}, 'attack_f05_k1': 0.7366850352273258, 'f1_k0': 0.4926859206475792, 'f1_k1': 0.4597210940594111, 'ew_auprc': 0.5477414332760489, 'epoch': 9.4}

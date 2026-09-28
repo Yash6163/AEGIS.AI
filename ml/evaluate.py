@@ -7,7 +7,7 @@ saw its time block. Nothing here is hand-entered: every number written to
 metrics.json is computed from these predictions.
 
 Models compared (probabilistic forecasts of s_{t+k}, k in HORIZONS):
-  world_model        GRU latent world model, Monte-Carlo rollout (ours)
+  world_model        ensemble of GRU latent world models, Monte-Carlo rollout (ours)
   markov_nowcast     first-order Markov chain T^k applied to the world model's
                      nowcast distribution p(s_t | x)
   markov_oracle      T^k applied to the TRUE current state (not available in
@@ -18,7 +18,7 @@ Models compared (probabilistic forecasts of s_{t+k}, k in HORIZONS):
   random_forest      one Random Forest per horizon, same inputs
   majority           always NORMAL
 
-Usage: python ml/evaluate.py [--version aegis-wm-1.0.0] [--fast]
+Usage: python ml/evaluate.py [--version aegis-wm-1.1.0] [--fast]
 """
 
 from __future__ import annotations
@@ -174,7 +174,7 @@ def flat(X: np.ndarray) -> np.ndarray:
 # ---------------------------------------------------------------- driver
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--version", default="aegis-wm-1.0.0")
+    ap.add_argument("--version", default="aegis-wm-1.1.0")
     ap.add_argument("--fast", action="store_true", help="skip the random forest baseline")
     args = ap.parse_args()
     torch.set_num_threads(4)
@@ -201,18 +201,22 @@ def main() -> None:
         Y.append(te.y), IDX.append(te.idx), FOLD.append(np.full(len(te), f))
 
         # --- world model
-        model, vloss, epoch = TR.train_world_model(seed=f, train=tr, val=va)
+        members = TR.train_members(tr, va, [100 * f + i for i in range(TR.N_MEMBERS)], log=None)
+        model = [m[0] for m in members]
+        vloss = float(np.mean([m[1] for m in members]))
+        epoch = [m[2] for m in members]
         rt = TR.to_runtime(model, mean, std)
         T, _ = TR.fit_temperature(rt, va)
         rt.manifest["temperature"] = T
         rv = rt.rollout(va.X, EW_H, TR.MC_SAMPLES_FIT, seed=321)
-        thr = TR.fit_warning_threshold(TR.attack_within(rv.paths, EW_H), va.y)
+        thr = TR.fit_warning_threshold(rt.attack_within_exact(rt.encode(va.X), EW_H), va.y)
         tt = time.perf_counter()
         r = rt.rollout(te.X, D.MAX_HORIZON, MC_SAMPLES, seed=7)
         latency.append((time.perf_counter() - tt) / len(te) * 1000)
         for k in range(D.MAX_HORIZON + 1):
             put("world_model", k, r.marginals[:, k])
-        ew["world_model"].append(TR.attack_within(r.paths, EW_H))
+        # exact P(attack within EW_H) - same quantity as the MC estimate, without sampling noise
+        ew["world_model"].append(rt.attack_within_exact(rt.encode(te.X), EW_H))
         ew_thr["world_model"].append(np.full(len(te), thr))
         put("world_model_compromise", 0, (np.isin(r.paths[:, :, 1:EW_H + 1], COMPROMISE_STATES)).any(2).mean(1)[:, None])
 

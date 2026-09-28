@@ -140,3 +140,13 @@ def test_replay_stream_raises_alerts_and_audit_chain_detects_tampering(client):
 def test_dashboard(client):
     d = client.get(f"{API}/dashboard").json()
     assert d["model"]["ready"] and "alerts" in d and d["headline_metrics"]["n_samples"] > 0
+
+
+def test_alert_names_an_attack_state_even_when_normal_dominates():
+    from aegis.services.alerts import most_likely_attack_state
+    fc = {"steps": [
+        {"distribution": {"NORMAL": 1.0, "IMPACT": 0.0}},
+        {"distribution": {"NORMAL": 0.8, "IMPACT": 0.05, "CREDENTIAL_ACCESS": 0.15}},
+        {"distribution": {"NORMAL": 0.7, "IMPACT": 0.2, "CREDENTIAL_ACCESS": 0.1}},
+    ]}
+    assert most_likely_attack_state(fc) == "IMPACT"

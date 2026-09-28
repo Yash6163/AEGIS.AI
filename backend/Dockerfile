@@ -12,7 +12,7 @@ RUN pip wheel --wheel-dir /wheels -r requirements.txt
 FROM python:3.12-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
     APP_ENV=production \
-    MODEL_DIR=/app/models/aegis-wm-1.0.0 \
+    MODEL_DIR=/app/models/aegis-wm-1.1.0 \
     SCENARIO_PATH=/app/data/scenarios/cicids2017_replay.npz
 RUN groupadd --system aegis && useradd --system --gid aegis --home /app aegis
 WORKDIR /app/backend

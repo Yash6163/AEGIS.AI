@@ -27,7 +27,7 @@ type Card_ = {
   model_version: string; model_type: string; created_at: string; dataset: string; weights_sha256: string; window_seconds: number;
   history_minutes: number; max_horizon_minutes: number; internal_networks: string; temperature: number;
   hyperparameters: Record<string, unknown>; training: { n_train: number; n_val: number; parameters: number; selected_seed: number };
-  early_warning: { horizon: number; threshold: number; target_false_alarm_rate: number };
+  early_warning: { horizon: number; threshold: number; selection?: string };
   features: { name: string; description: string }[];
   states: { state: StateName; label: string; severity: number; compromise: boolean; mitre_tactic: string | null; mitre_tactic_id: string | null; description: string }[];
   label_mapping: { dataset_label: string; state: StateName }[];
@@ -86,7 +86,7 @@ export default function ModelPage() {
                 ["hosts", card.data.internal_networks],
                 ["training", `${card.data.training.n_train.toLocaleString()} train / ${card.data.training.n_val.toLocaleString()} val host-minutes`],
                 ["calibration", `temperature ${card.data.temperature}`],
-                ["early warning", `P(attack ≤ ${card.data.early_warning.horizon} min) ≥ ${card.data.early_warning.threshold} (val FAR ≤ ${pct(card.data.early_warning.target_false_alarm_rate)})`],
+                ["early warning", `P(attack ≤ ${card.data.early_warning.horizon} min) ≥ ${card.data.early_warning.threshold} (threshold maximises validation F0.5)`],
                 ["weights sha256", <span key="h" className="break-all font-mono text-[10px]">{card.data.weights_sha256}</span>],
               ].map(([k2, v]) => (
                 <React.Fragment key={String(k2)}><dt className="text-ink-3">{k2}</dt><dd className="text-ink-1">{v}</dd></React.Fragment>
@@ -153,7 +153,7 @@ export default function ModelPage() {
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card title={`Early warning: attack within ${d?.early_warning.horizon ?? 5} minutes`} subtitle="Binary target: any attack state in the next minutes. Thresholds chosen on validation folds for ≤ 2% false alarms.">
+        <Card title={`Early warning: attack within ${d?.early_warning.horizon ?? 5} minutes`} subtitle="Binary target: any attack state in the next minutes. Each model's threshold maximises F0.5 on its validation fold - the same rule for every model.">
           {!d ? <Skeleton className="h-40" /> : (
             <table className="w-full text-xs">
               <thead className="text-ink-3"><tr><th className="py-1 text-left font-normal">model</th><th className="text-right font-normal">AUROC</th><th className="text-right font-normal">AUPRC</th><th className="text-right font-normal">recall</th><th className="text-right font-normal">precision</th><th className="text-right font-normal">F0.5</th><th className="text-right font-normal">F1</th><th className="text-right font-normal">F2</th><th className="text-right font-normal">false alarms</th></tr></thead>

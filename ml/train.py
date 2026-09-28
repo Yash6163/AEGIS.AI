@@ -2,12 +2,12 @@
 
   * training folds = all except PRODUCTION_VAL_FOLD, which is used for early
     stopping, temperature calibration and the early-warning threshold
-  * N_SEEDS seeds; the production model is the seed with the lowest
-    validation loss (generalisation is estimated separately by evaluate.py
-    with 5-fold blocked cross-validation of this same procedure)
+  * N_MEMBERS seeds, all kept as an equal-weight ensemble (no seed picking);
+    generalisation is estimated separately by evaluate.py with 5-fold blocked
+    cross-validation of this same procedure
   * exports models/<version>/{weights.npz, manifest.json}
 
-Usage: python ml/train.py [--version aegis-wm-1.0.0]
+Usage: python ml/train.py [--version aegis-wm-1.1.0]
 """
 
 from __future__ import annotations
@@ -32,24 +32,28 @@ import data as D  # noqa: E402
 from model import AttackWorldModel  # noqa: E402
 
 from aegis.forecasting.features import FEATURE_NAMES  # noqa: E402
-from aegis.forecasting.runtime import WorldModelRuntime  # noqa: E402
+from aegis.forecasting.runtime import EnsembleRuntime, WorldModelRuntime, load_runtime  # noqa: E402
 from aegis.forecasting.states import ATTACK_STATES, NUM_STATES, STATE_NAMES  # noqa: E402
 
-N_SEEDS = 3
+N_MEMBERS = 5  # ensemble size: seeds 0..N_MEMBERS-1, all kept (no seed picking)
 # Selected by ml/tune.py on validation folds (see models/<version>/tuning.json)
 HIDDEN, STATE_EMB, DROPOUT = 64, 16, 0.4
 LR, WEIGHT_DECAY, BATCH, MAX_EPOCHS, PATIENCE = 1e-3, 1e-3, 128, 120, 15
 SELECT = "unweighted"  # early-stopping criterion: class-weighted or plain validation NLL
+CLASS_WEIGHT_POWER = 0.0  # round-2 tuning: plain maximum likelihood won on every validation metric
 INPUT_CLIP = 0.0  # >0: clip standardised features to [-c, c] (model and runtime)
 WARNING_HORIZON = 5
-TARGET_FALSE_ALARM_RATE = 0.02
+THRESHOLD_BETA = 0.5  # warning threshold maximises validation F-beta (0.5 = precision-weighted)
 MC_SAMPLES_FIT = 256
 
 
 def class_weights(y: np.ndarray) -> torch.Tensor:
-    """sqrt inverse-frequency weights over states present in training."""
+    """(inverse frequency) ** CLASS_WEIGHT_POWER over states present in training.
+
+    0 = plain maximum likelihood (calibrated priors, highest precision),
+    0.5 = square-root re-weighting (more recall on rare attack states)."""
     counts = np.bincount(y[y >= 0], minlength=NUM_STATES).astype(np.float64)
-    w = np.where(counts > 0, (counts.sum() / np.maximum(counts, 1)) ** 0.5, 0.0)
+    w = np.where(counts > 0, (counts.sum() / np.maximum(counts, 1)) ** CLASS_WEIGHT_POWER, 0.0)
     w = w / w[counts > 0].mean()
     return torch.tensor(w, dtype=torch.float32)
 
@@ -97,17 +101,31 @@ def train_world_model(seed: int, train: D.SequenceSet, val: D.SequenceSet, verbo
     return model, best, best_epoch
 
 
-def to_runtime(model: AttackWorldModel, mean: np.ndarray, std: np.ndarray, temperature: float = 1.0) -> WorldModelRuntime:
-    weights = {k: v.astype(np.float64) for k, v in model.export_numpy().items()}
+def train_members(train: D.SequenceSet, val: D.SequenceSet, seeds, log=print) -> list[tuple]:
+    """Train one model per seed; returns [(model, val_loss, best_epoch, seed)]."""
+    out = []
+    for seed in seeds:
+        t0 = time.time()
+        model, vloss, epoch = train_world_model(seed, train, val)
+        out.append((model, vloss, epoch, seed))
+        if log:
+            log(f"  member seed {seed}: val loss {vloss:.4f} @ epoch {epoch} ({time.time() - t0:.0f}s)")
+    return out
+
+
+def to_runtime(models, mean: np.ndarray, std: np.ndarray, temperature: float = 1.0):
+    """Runtime for one model or an equal-weight ensemble of models."""
+    models = models if isinstance(models, list | tuple) else [models]
     manifest = {
         "feature_mean": mean.tolist(), "feature_std": std.tolist(),
         "history": D.HISTORY, "max_horizon": D.MAX_HORIZON, "temperature": temperature,
-        "input_clip": INPUT_CLIP,
+        "input_clip": INPUT_CLIP, "members": len(models),
     }
-    return WorldModelRuntime(weights, manifest)
+    members = [WorldModelRuntime({k: v.astype(np.float64) for k, v in m.export_numpy().items()}, manifest) for m in models]
+    return members[0] if len(members) == 1 else EnsembleRuntime(members, manifest)
 
 
-def fit_temperature(rt: WorldModelRuntime, val: D.SequenceSet) -> tuple[float, dict]:
+def fit_temperature(rt, val: D.SequenceSet) -> tuple[float, dict]:
     """Single decoder temperature minimising validation NLL of the exact
     nowcast p(s_t) and one-step marginal p(s_{t+1}) (both deterministic)."""
     h = rt.encode(val.X)
@@ -130,14 +148,20 @@ def ood_reference(windows, folds: list[int], mean: np.ndarray, std: np.ndarray) 
             "max": float(z.max())}
 
 
-def export_artifact(out: Path, model: AttackWorldModel, manifest: dict) -> None:
-    """Write weights.npz + manifest.json (with checksum) and verify they load."""
+def export_artifact(out: Path, models, manifest: dict) -> None:
+    """Write weights.npz (+ member prefixes for ensembles) and manifest.json
+    with checksum, then verify the artifact loads."""
+    models = models if isinstance(models, list | tuple) else [models]
     out.mkdir(parents=True, exist_ok=True)
     weights_path = out / "weights.npz"
-    np.savez(weights_path, **{k: v.astype(np.float32) for k, v in model.export_numpy().items()})
-    manifest = {**manifest, "weights_sha256": hashlib.sha256(weights_path.read_bytes()).hexdigest()}
+    if len(models) == 1:
+        arrays = {k: v.astype(np.float32) for k, v in models[0].export_numpy().items()}
+    else:
+        arrays = {f"m{i}__{k}": v.astype(np.float32) for i, m in enumerate(models) for k, v in m.export_numpy().items()}
+    np.savez(weights_path, **arrays)
+    manifest = {**manifest, "members": len(models), "weights_sha256": hashlib.sha256(weights_path.read_bytes()).hexdigest()}
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2))
-    WorldModelRuntime.load(out)
+    load_runtime(out)
 
 
 def attack_within(paths: np.ndarray, horizon: int) -> np.ndarray:
@@ -151,18 +175,37 @@ def quiet_mask(y: np.ndarray, horizon: int) -> np.ndarray:
     return ((fut == 0) | (fut < 0)).all(axis=1) & (fut[:, horizon] >= 0)
 
 
-def fit_warning_threshold(scores: np.ndarray, y: np.ndarray, horizon: int = WARNING_HORIZON) -> float:
-    """Lowest threshold with false-alarm rate <= target on quiet validation samples."""
-    quiet = quiet_mask(y, horizon)
+def warning_target(y: np.ndarray, horizon: int = WARNING_HORIZON) -> tuple[np.ndarray, np.ndarray]:
+    """(valid mask, target): target = any attack state among s_{t+1..t+horizon}."""
+    fut = y[:, 1:horizon + 1]
+    valid = fut[:, -1] >= 0
+    return valid, (fut > 0).any(axis=1)
+
+
+def fit_warning_threshold(scores: np.ndarray, y: np.ndarray, horizon: int = WARNING_HORIZON,
+                          beta: float = THRESHOLD_BETA) -> float:
+    """Threshold maximising F-beta of the early-warning decision on validation.
+
+    beta = 0.5 weights precision twice as much as recall (fewer false alarms);
+    ties go to the higher threshold."""
+    valid, target = warning_target(y, horizon)
+    s, t = scores[valid], target[valid]
+    best, best_f = 1.0, -1.0
     for cand in np.round(np.arange(0.02, 1.0, 0.01), 2):
-        if (scores[quiet] >= cand).mean() <= TARGET_FALSE_ALARM_RATE:
-            return float(cand)
-    return 1.0
+        warn = s >= cand
+        tp = float((warn & t).sum())
+        if tp == 0:
+            continue
+        p, r = tp / warn.sum(), tp / t.sum()
+        f = (1 + beta**2) * p * r / (beta**2 * p + r)
+        if f >= best_f:
+            best, best_f = float(cand), f
+    return best
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--version", default="aegis-wm-1.0.0")
+    ap.add_argument("--version", default="aegis-wm-1.1.0")
     ap.add_argument("--windows", default="data/processed/windows.parquet")
     args = ap.parse_args()
     torch.set_num_threads(4)
@@ -175,25 +218,17 @@ def main() -> None:
     train, val = seqs.subset(np.isin(fold, train_folds)), seqs.subset(fold == val_fold)
     print(f"train={len(train)} val={len(val)} states(train)={np.bincount(train.y[:, 0], minlength=NUM_STATES).tolist()}")
 
-    results = []
-    for seed in range(N_SEEDS):
-        t0 = time.time()
-        model, vloss, epoch = train_world_model(seed, train, val)
-        results.append((vloss, seed, epoch, model))
-        print(f"seed {seed}: best val loss {vloss:.4f} @ epoch {epoch} ({time.time() - t0:.0f}s)")
-    vloss, seed, epoch, model = min(results, key=lambda r: r[0])
-    print(f"selected seed {seed}")
-
-    rt = to_runtime(model, mean, std)
+    results = train_members(train, val, range(N_MEMBERS))
+    models = [r[0] for r in results]
+    rt = to_runtime(models, mean, std)
     T, nll_curve = fit_temperature(rt, val)
     rt.manifest["temperature"] = T
-    r = rt.rollout(val.X, WARNING_HORIZON, MC_SAMPLES_FIT, seed=321)
-    thr = fit_warning_threshold(attack_within(r.paths, WARNING_HORIZON), val.y)
+    thr = fit_warning_threshold(rt.attack_within_exact(rt.encode(val.X), WARNING_HORIZON), val.y)
 
     meta = json.loads((ROOT / "data" / "processed" / "windows_meta.json").read_text())
     manifest = {
         "model_version": args.version,
-        "model_type": "GRU latent world model (autoregressive attack-state transition model)",
+        "model_type": f"Ensemble of {N_MEMBERS} GRU latent world models (autoregressive attack-state transition model)",
         "created_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "dataset": meta["dataset"],
         "dataset_sha256": meta["raw_file_sha256"],
@@ -212,15 +247,15 @@ def main() -> None:
         "hyperparameters": {
             "hidden": HIDDEN, "state_embedding": STATE_EMB, "dropout": DROPOUT, "lr": LR,
             "weight_decay": WEIGHT_DECAY, "batch": BATCH, "max_epochs": MAX_EPOCHS, "patience": PATIENCE,
-            "early_stopping": SELECT, "input_clip": INPUT_CLIP,
+            "early_stopping": SELECT, "input_clip": INPUT_CLIP, "class_weight_power": CLASS_WEIGHT_POWER,
             "block_minutes": D.BLOCK_MINUTES, "n_folds": D.N_FOLDS, "val_fold": val_fold,
         },
         "training": {
-            "seeds": [{"seed": s, "val_loss": round(v, 5), "best_epoch": e} for v, s, e, _ in results],
-            "selected_seed": seed,
+            "members": [{"seed": s, "val_loss": round(v, 5), "best_epoch": e} for _, v, e, s in results],
             "train_folds": train_folds,
             "n_train": len(train), "n_val": len(val),
-            "parameters": int(sum(v.size for v in model.export_numpy().values())),
+            "parameters": int(sum(v.size for m in models for v in m.export_numpy().values())),
+            "parameters_per_member": int(sum(v.size for v in models[0].export_numpy().values())),
         },
         "temperature": T,
         "calibration": {
@@ -229,12 +264,12 @@ def main() -> None:
         },
         "early_warning": {
             "horizon": WARNING_HORIZON, "threshold": thr,
-            "target_false_alarm_rate": TARGET_FALSE_ALARM_RATE,
+            "selection": f"threshold maximising validation F{THRESHOLD_BETA:g} of 'attack within horizon'",
             "definition": "warn when P(any attack state within the next `horizon` minutes) >= threshold",
         },
     }
     out = ROOT / "models" / args.version
-    export_artifact(out, model, manifest)
+    export_artifact(out, models, manifest)
     print(f"temperature={T} warning threshold={thr}; artifact written to {out}")
 
 

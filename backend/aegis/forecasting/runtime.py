@@ -139,6 +139,25 @@ class WorldModelRuntime:
             p1 += p0[:, s:s + 1] * self.decode(h1, temperature)
         return p0, p1
 
+    def attack_within_exact(self, h: np.ndarray, horizon: int, temperature: float | None = None) -> np.ndarray:
+        """Exact P(any attack state among s_{t+1..t+horizon}).
+
+        "No attack" is the single all-NORMAL continuation for each possible
+        current state, so P(no attack) = sum_s p(s_t=s) prod_k p(s_{t+k}=NORMAL | s, NORMAL, ...).
+        Costs n_states x horizon model steps and has no Monte-Carlo noise."""
+        p0 = self.decode(h, temperature)
+        B = h.shape[0]
+        normal = np.zeros(B, dtype=int)
+        quiet = np.zeros(B)
+        for s in range(self.n_states):
+            hk = self.transition(h, np.full(B, s))
+            prob = p0[:, s].copy()
+            for _ in range(horizon):
+                prob *= self.decode(hk, temperature)[:, 0]
+                hk = self.transition(hk, normal)
+            quiet += prob
+        return 1.0 - quiet
+
     def rollout(
         self,
         x_std: np.ndarray,
@@ -179,3 +198,83 @@ class WorldModelRuntime:
         marg = np.bincount(flat.ravel(), minlength=B * (horizon + 1) * S).reshape(B, horizon + 1, S) / n_samples
         marg[:, 0] = nowcast
         return Rollout(nowcast=nowcast, paths=paths_arr, marginals=marg)
+
+
+class EnsembleRuntime:
+    """Equal-weight mixture of world models trained with different seeds.
+
+    Nowcast and exact one-step marginals are member averages; Monte-Carlo
+    samples are split evenly across members, so marginals, trajectory trees and
+    hit probabilities are those of the mixture distribution. Members share the
+    feature standardisation (same training folds) and one decoder temperature.
+    Exposes the same interface as WorldModelRuntime.
+    """
+
+    def __init__(self, members: list[WorldModelRuntime], manifest: dict):
+        if not members:
+            raise ArtifactError("ensemble has no members")
+        self.members = members
+        self.manifest = manifest
+        self.mean = np.asarray(manifest["feature_mean"], dtype=np.float64)
+        self.std = np.asarray(manifest["feature_std"], dtype=np.float64)
+
+    history = WorldModelRuntime.history
+    max_horizon = WorldModelRuntime.max_horizon
+    temperature = WorldModelRuntime.temperature
+    standardise = WorldModelRuntime.standardise
+
+    @property
+    def n_states(self) -> int:
+        return self.members[0].n_states
+
+    def _T(self, temperature: float | None) -> float:
+        return self.temperature if temperature is None else temperature
+
+    def encode(self, x_std: np.ndarray) -> np.ndarray:
+        """(M, B, H) latent states, one slice per member."""
+        return np.stack([m.encode(x_std) for m in self.members])
+
+    def decode(self, h: np.ndarray, temperature: float | None = None) -> np.ndarray:
+        return np.mean([m.decode(hm, self._T(temperature)) for m, hm in zip(self.members, h, strict=True)], axis=0)
+
+    def next_state_exact(self, h: np.ndarray, temperature: float | None = None) -> tuple[np.ndarray, np.ndarray]:
+        outs = [m.next_state_exact(hm, self._T(temperature)) for m, hm in zip(self.members, h, strict=True)]
+        return np.mean([o[0] for o in outs], axis=0), np.mean([o[1] for o in outs], axis=0)
+
+    def attack_within_exact(self, h: np.ndarray, horizon: int, temperature: float | None = None) -> np.ndarray:
+        return np.mean([m.attack_within_exact(hm, horizon, self._T(temperature)) for m, hm in zip(self.members, h, strict=True)], axis=0)
+
+    def rollout(self, x_std: np.ndarray, horizon: int, n_samples: int = 512, seed: int = 0,
+                temperature: float | None = None, h0: np.ndarray | None = None) -> Rollout:
+        M = len(self.members)
+        per = -(-n_samples // M)  # ceil
+        h = self.encode(x_std) if h0 is None else h0
+        rs = [m.rollout(None, horizon, per, seed=seed * 1009 + i, temperature=self._T(temperature), h0=h[i])
+              for i, m in enumerate(self.members)]
+        paths = np.concatenate([r.paths for r in rs], axis=1)[:, :n_samples]
+        marg = np.mean([r.marginals for r in rs], axis=0)
+        now = np.mean([r.nowcast for r in rs], axis=0)
+        marg[:, 0] = now
+        return Rollout(nowcast=now, paths=paths, marginals=marg)
+
+
+def load_runtime(artifact_dir: str | Path) -> WorldModelRuntime | EnsembleRuntime:
+    """Load a single model or an ensemble (manifest key `members`)."""
+    d = Path(artifact_dir)
+    manifest_path, weights_path = d / "manifest.json", d / "weights.npz"
+    if not manifest_path.is_file() or not weights_path.is_file():
+        raise ArtifactError(f"model artifact not found in {d}")
+    manifest = json.loads(manifest_path.read_text())
+    n = int(manifest.get("members", 1) or 1)
+    if n == 1:
+        return WorldModelRuntime.load(d)
+    if manifest.get("weights_sha256") != hashlib.sha256(weights_path.read_bytes()).hexdigest():
+        raise ArtifactError("weights.npz checksum does not match manifest")
+    members = []
+    with np.load(weights_path, allow_pickle=False) as npz:
+        for i in range(n):
+            missing = [k for k in WEIGHT_KEYS if f"m{i}__{k}" not in npz.files]
+            if missing:
+                raise ArtifactError(f"member {i} missing keys: {missing}")
+            members.append(WorldModelRuntime({k: npz[f"m{i}__{k}"].astype(np.float64) for k in WEIGHT_KEYS}, manifest))
+    return EnsembleRuntime(members, manifest)

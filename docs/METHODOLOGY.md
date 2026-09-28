@@ -79,7 +79,14 @@ p(S_{t+k} | x, S_t..S_{t+k-1}) = softmax(D h_{t+k} / T)             shared decod
   previous attack state, so the model can be rolled forward without future
   observations.
 * **Training**: maximum likelihood with teacher forcing over S_t..S_{t+10},
-  square-root inverse-frequency class weights, AdamW, early stopping.
+  AdamW, early stopping on validation NLL. Class re-weighting (inverse frequency
+  to the power 0.25 or 0.5) was evaluated and rejected on validation folds (round 2 of
+  tuning): it increased false alarms and lowered macro-F1, AUPRC and F0.5.
+* **Ensemble**: five members trained with different seeds, combined as an equal-weight
+  mixture (`EnsembleRuntime`): nowcasts and exact one-step marginals are averaged, and
+  Monte-Carlo samples are split evenly across members. No seed is picked by score.
+* **Warning threshold**: chosen on the validation fold to maximise F0.5 of "attack within
+  5 minutes" (precision weighted twice as much as recall). Baselines get the same rule.
 * **Inference**: ancestral Monte-Carlo sampling (512 trajectories by default).
   Sample paths that share a prefix share the latent computation, which makes
   it cheap. From the samples we get per-step marginals, a branching tree of
@@ -167,6 +174,27 @@ and attack recall at +5 min 62% vs 36%
 validation-selected model. Switching because of test scores would turn the test
 folds into a selection set and bias every reported number. The gap shows
 how noisy model selection is with so few attack episodes.
+
+### Round 2 (model v1.1.0)
+
+A second validation-only search (`models/aegis-wm-1.1.0/tuning_round2.log`)
+varied the class re-weighting strength (inverse frequency to the power 0, 0.25,
+0.5) and dropout. Plain maximum likelihood (power 0) won on **every** validation
+criterion at once: macro-F1, early-warning AUPRC and attack F0.5. Re-weighting
+had made the model over-predict rare attack states, which is why v1.0.0 had low
+precision. v1.1.0 also:
+
+* uses a 5-member seed ensemble (no seed picked by score);
+* sets the warning threshold to maximise validation F0.5, with the same rule
+  applied to every baseline;
+* computes P(attack within K) **exactly** instead of by Monte-Carlo. "No attack"
+  is a single all-NORMAL continuation per current state, so the probability costs
+  7 × K model steps. The exact value agrees with a 20 000-sample Monte-Carlo
+  estimate (unit-tested) and removes the sampling ties that blurred ranking
+  metrics (AUROC/AUPRC). The trajectory tree and compromise probability are
+  still sampled.
+
+v1.0.0 remains in `models/aegis-wm-1.0.0/` for comparison.
 
 ## 11. Known limitations
 
