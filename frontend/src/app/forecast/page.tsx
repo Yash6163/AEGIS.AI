@@ -23,7 +23,7 @@ function ForecastPage() {
   const toast = useToast();
   const scenarios = useApi<{ scenarios: ScenarioMeta[]; data_label: string; citation: string }>("/scenarios");
   const scenarioId = params.get("scenario") ?? "cicids2017-thursday";
-  const [t, setT] = useState<number>(Number(params.get("t") ?? 25));
+  const [t, setT] = useState<number>(Number(params.get("t") ?? 10));
   const [host, setHost] = useState<string | null>(params.get("host"));
   const [horizon, setHorizon] = useState<number>(5);
   const [speed, setSpeed] = useState<number>(700);
@@ -39,7 +39,7 @@ function ForecastPage() {
 
   const selectScenario = (id: string) => {
     stop();
-    setSnap(null); setFc(null); setHost(null); setT(25); setLiveAlerts([]);
+    setSnap(null); setFc(null); setHost(null); setT(10); setLiveAlerts([]);
     router.replace(`/forecast?scenario=${id}`);
   };
 

@@ -27,7 +27,7 @@ import argparse
 import json
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # xgboost must be imported before torch: on macOS the two bundle different
@@ -61,7 +61,7 @@ def ece(probs: np.ndarray, y: np.ndarray, bins: int = 15) -> tuple[float, list[d
     pred = probs.argmax(1)
     edges = np.linspace(0, 1, bins + 1)
     out, total = [], 0.0
-    for lo, hi in zip(edges[:-1], edges[1:]):
+    for lo, hi in zip(edges[:-1], edges[1:], strict=False):
         m = (conf > lo) & (conf <= hi)
         if m.sum() == 0:
             continue
@@ -379,7 +379,7 @@ def main() -> None:
 
     metrics = {
         "model_version": args.version,
-        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "protocol": {
             "type": f"{D.N_FOLDS}-fold blocked cross-validation, out-of-fold predictions pooled",
             "block_minutes": D.BLOCK_MINUTES, "history": D.HISTORY, "max_horizon": D.MAX_HORIZON,

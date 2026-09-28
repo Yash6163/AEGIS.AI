@@ -37,11 +37,11 @@ def snapshot(reg: Registry, scenario_id: str, t: int, use_cv: bool = True) -> di
     stats = store.stats(scenario_id, t)
     meta = store.get(scenario_id)
     hosts = []
-    for i, (h, s) in enumerate(zip(meta["hosts"], summaries)):
+    for i, (h, s) in enumerate(zip(meta["hosts"], summaries, strict=False)):
         hosts.append({
             "host": h["host"], "role": h["role"], **s,
             "truth_state": STATE_NAMES[int(truth[i])],
-            "stats": dict(zip(store.stat_columns, map(int, stats[i]))),
+            "stats": dict(zip(store.stat_columns, map(int, stats[i]), strict=False)),
         })
     return {
         "scenario": scenario_id, "t": t, "n_windows": n,

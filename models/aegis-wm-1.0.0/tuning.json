@@ -1,0 +1,194 @@
+[
+ {
+  "config": {
+   "HIDDEN": 64,
+   "DROPOUT": 0.4,
+   "SELECT": "unweighted",
+   "INPUT_CLIP": 0.0
+  },
+  "f1_k0": 0.4260526525889919,
+  "f1_k1": 0.4114835930443005,
+  "ew_auprc": 0.4841075081110923,
+  "epoch": 12.0
+ },
+ {
+  "config": {
+   "HIDDEN": 64,
+   "DROPOUT": 0.4,
+   "SELECT": "unweighted",
+   "INPUT_CLIP": 8.0
+  },
+  "f1_k0": 0.4354297553667804,
+  "f1_k1": 0.4133393940889348,
+  "ew_auprc": 0.478742611351065,
+  "epoch": 12.0
+ },
+ {
+  "config": {
+   "HIDDEN": 32,
+   "DROPOUT": 0.4,
+   "SELECT": "unweighted",
+   "INPUT_CLIP": 0.0
+  },
+  "f1_k0": 0.44064819344499667,
+  "f1_k1": 0.4391103166361111,
+  "ew_auprc": 0.44673597788579295,
+  "epoch": 13.4
+ },
+ {
+  "config": {
+   "HIDDEN": 32,
+   "DROPOUT": 0.4,
+   "SELECT": "unweighted",
+   "INPUT_CLIP": 8.0
+  },
+  "f1_k0": 0.43902117060758605,
+  "f1_k1": 0.44160934180850064,
+  "ew_auprc": 0.4382734368720877,
+  "epoch": 15.0
+ },
+ {
+  "config": {
+   "HIDDEN": 64,
+   "DROPOUT": 0.2,
+   "SELECT": "unweighted",
+   "INPUT_CLIP": 8.0
+  },
+  "f1_k0": 0.4255761368644168,
+  "f1_k1": 0.3992911979889857,
+  "ew_auprc": 0.4778864418166696,
+  "epoch": 11.8
+ },
+ {
+  "config": {
+   "HIDDEN": 32,
+   "DROPOUT": 0.2,
+   "SELECT": "unweighted",
+   "INPUT_CLIP": 8.0
+  },
+  "f1_k0": 0.47064839004955383,
+  "f1_k1": 0.44058618942429,
+  "ew_auprc": 0.43070003958328706,
+  "epoch": 11.0
+ },
+ {
+  "config": {
+   "HIDDEN": 64,
+   "DROPOUT": 0.2,
+   "SELECT": "unweighted",
+   "INPUT_CLIP": 0.0
+  },
+  "f1_k0": 0.4191317376454521,
+  "f1_k1": 0.3955470483817902,
+  "ew_auprc": 0.46936712138088854,
+  "epoch": 11.8
+ },
+ {
+  "config": {
+   "HIDDEN": 32,
+   "DROPOUT": 0.2,
+   "SELECT": "unweighted",
+   "INPUT_CLIP": 0.0
+  },
+  "f1_k0": 0.4608357777561462,
+  "f1_k1": 0.4386737178792496,
+  "ew_auprc": 0.42287034371691534,
+  "epoch": 12.6
+ },
+ {
+  "config": {
+   "HIDDEN": 32,
+   "DROPOUT": 0.2,
+   "SELECT": "weighted",
+   "INPUT_CLIP": 0.0
+  },
+  "f1_k0": 0.45662865565151617,
+  "f1_k1": 0.42505953943208724,
+  "ew_auprc": 0.4070982682524181,
+  "epoch": 10.4
+ },
+ {
+  "config": {
+   "HIDDEN": 32,
+   "DROPOUT": 0.2,
+   "SELECT": "weighted",
+   "INPUT_CLIP": 8.0
+  },
+  "f1_k0": 0.44735970061004365,
+  "f1_k1": 0.4184881813457048,
+  "ew_auprc": 0.39298756597154005,
+  "epoch": 7.8
+ },
+ {
+  "config": {
+   "HIDDEN": 64,
+   "DROPOUT": 0.4,
+   "SELECT": "weighted",
+   "INPUT_CLIP": 0.0
+  },
+  "f1_k0": 0.41066734203178185,
+  "f1_k1": 0.3911367160316208,
+  "ew_auprc": 0.40445373583511535,
+  "epoch": 4.4
+ },
+ {
+  "config": {
+   "HIDDEN": 64,
+   "DROPOUT": 0.4,
+   "SELECT": "weighted",
+   "INPUT_CLIP": 8.0
+  },
+  "f1_k0": 0.411212199668414,
+  "f1_k1": 0.39055908664962835,
+  "ew_auprc": 0.4015234596906995,
+  "epoch": 4.4
+ },
+ {
+  "config": {
+   "HIDDEN": 64,
+   "DROPOUT": 0.2,
+   "SELECT": "weighted",
+   "INPUT_CLIP": 8.0
+  },
+  "f1_k0": 0.40993928859024936,
+  "f1_k1": 0.38934007374642376,
+  "ew_auprc": 0.39730073612505795,
+  "epoch": 3.4
+ },
+ {
+  "config": {
+   "HIDDEN": 64,
+   "DROPOUT": 0.2,
+   "SELECT": "weighted",
+   "INPUT_CLIP": 0.0
+  },
+  "f1_k0": 0.4068067891778976,
+  "f1_k1": 0.38828636420420604,
+  "ew_auprc": 0.39630734625942976,
+  "epoch": 3.4
+ },
+ {
+  "config": {
+   "HIDDEN": 32,
+   "DROPOUT": 0.4,
+   "SELECT": "weighted",
+   "INPUT_CLIP": 0.0
+  },
+  "f1_k0": 0.4493350458276118,
+  "f1_k1": 0.4127888189457196,
+  "ew_auprc": 0.33370126394612304,
+  "epoch": 10.4
+ },
+ {
+  "config": {
+   "HIDDEN": 32,
+   "DROPOUT": 0.4,
+   "SELECT": "weighted",
+   "INPUT_CLIP": 8.0
+  },
+  "f1_k0": 0.4540088501486673,
+  "f1_k1": 0.4180437854080771,
+  "ew_auprc": 0.316929530118228,
+  "epoch": 10.4
+ }
+]

@@ -70,7 +70,7 @@ def main() -> None:
         setattr(TR, k, v)
     keys = list(GRID)
     for values in itertools.product(*GRID.values()):
-        cfg = dict(zip(keys, values))
+        cfg = dict(zip(keys, values, strict=False))
         for k, v in cfg.items():
             setattr(TR, k, v)
         t0 = time.time()

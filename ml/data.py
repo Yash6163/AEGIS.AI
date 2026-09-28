@@ -67,7 +67,7 @@ def assign_folds(windows: pd.DataFrame, block_minutes: int = BLOCK_MINUTES, n_fo
         score = (n_testable, -spread)
         if best_score is None or score > best_score:
             best, best_score = fold, score
-    w["fold"] = w["block"].map(dict(zip(ids, best))).astype(int)
+    w["fold"] = w["block"].map(dict(zip(ids, best, strict=False))).astype(int)
     return w
 
 
@@ -80,7 +80,7 @@ class SequenceSet:
     def __len__(self) -> int:
         return len(self.idx)
 
-    def subset(self, mask: np.ndarray) -> "SequenceSet":
+    def subset(self, mask: np.ndarray) -> SequenceSet:
         return SequenceSet(self.X[mask], self.y[mask], self.idx[mask])
 
 

@@ -51,6 +51,12 @@ const METRICS: { key: keyof PM; label: string; fmt: (v: number) => string; lower
   { key: "accuracy", label: "Accuracy", fmt: (v) => pct(v, 1) },
 ];
 
+/** F-beta from precision and recall; beta < 1 favours precision. */
+function fbeta(p: number | null | undefined, r: number | null | undefined, b: number): number | null {
+  if (p == null || r == null || b * b * p + r === 0) return null;
+  return ((1 + b * b) * p * r) / (b * b * p + r);
+}
+
 export default function ModelPage() {
   const m = useApi<Metrics>("/model/metrics");
   const card = useApi<Card_>("/model");
@@ -150,7 +156,7 @@ export default function ModelPage() {
         <Card title={`Early warning: attack within ${d?.early_warning.horizon ?? 5} minutes`} subtitle="Binary target: any attack state in the next minutes. Thresholds chosen on validation folds for ≤ 2% false alarms.">
           {!d ? <Skeleton className="h-40" /> : (
             <table className="w-full text-xs">
-              <thead className="text-ink-3"><tr><th className="py-1 text-left font-normal">model</th><th className="text-right font-normal">AUROC</th><th className="text-right font-normal">AUPRC</th><th className="text-right font-normal">recall</th><th className="text-right font-normal">precision</th><th className="text-right font-normal">false alarms</th></tr></thead>
+              <thead className="text-ink-3"><tr><th className="py-1 text-left font-normal">model</th><th className="text-right font-normal">AUROC</th><th className="text-right font-normal">AUPRC</th><th className="text-right font-normal">recall</th><th className="text-right font-normal">precision</th><th className="text-right font-normal">F0.5</th><th className="text-right font-normal">F1</th><th className="text-right font-normal">F2</th><th className="text-right font-normal">false alarms</th></tr></thead>
               <tbody>
                 {Object.entries(d.early_warning.models).map(([name, r]) => (
                   <tr key={name} className="border-t border-line">
@@ -159,6 +165,7 @@ export default function ModelPage() {
                     <td className="text-right tabular-nums">{num(r.auprc, 3)}</td>
                     <td className="text-right tabular-nums">{pct(r.recall_at_threshold ?? null)}</td>
                     <td className="text-right tabular-nums">{pct(r.precision_at_threshold ?? null)}</td>
+                    {[0.5, 1, 2].map((b) => <td key={b} className="text-right tabular-nums">{num(fbeta(r.precision_at_threshold, r.recall_at_threshold, b), 3)}</td>)}
                     <td className="text-right tabular-nums">{pct(r.false_alarm_rate_at_threshold ?? null, 1)}</td>
                   </tr>
                 ))}

@@ -18,7 +18,7 @@ from __future__ import annotations
 import json
 from collections.abc import Iterator
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Protocol
 
@@ -126,7 +126,7 @@ class ReplaySource:
         for t in range(start, self.store.n_windows(self.scenario_id)):
             yield WindowBatch(
                 index=t,
-                window_start=self.store.window_start(self.scenario_id, t).astimezone(timezone.utc),
+                window_start=self.store.window_start(self.scenario_id, t).astimezone(UTC),
                 hosts=self.store.hosts(self.scenario_id),
                 features=feats[:, t],
                 stats=self.store.stats(self.scenario_id, t),

@@ -13,7 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -27,7 +27,7 @@ _lock = threading.Lock()
 def _ts(dt: datetime) -> str:
     """UTC second-resolution timestamp, identical whether or not the DB keeps tzinfo."""
     if dt.tzinfo is not None:
-        dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        dt = dt.astimezone(UTC).replace(tzinfo=None)
     return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 

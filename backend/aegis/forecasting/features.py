@@ -15,7 +15,7 @@ import ipaddress
 import numpy as np
 import pandas as pd
 
-from .states import AttackState, NUM_STATES, map_label
+from .states import NUM_STATES, AttackState, map_label
 
 # canonical name -> accepted source column names (compared after `_key`)
 COLUMN_ALIASES: dict[str, list[str]] = {
