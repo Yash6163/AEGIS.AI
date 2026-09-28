@@ -275,6 +275,14 @@ def slide1(s):
             rpr.insert(0, clr)
     # the PS category line reads "PS Category- Software/Hardware" in the template: keep label, value = Software
     tb.width = Inches(7.0)
+    members = ["Palak Harbola (Leader)", "Yash Kumar", "Ansh Pratap Singh", "Aditya Sharma", "Tamandeep Singh Bhatia", "Atiksh Gupta"]
+    text(s, 0.45, 6.15, 7.2, 0.95, [
+        [("Team: ", {"bold": True, "color": NAVY}), (" · ".join(members), {})],
+        [("Mentor: ", {"bold": True, "color": NAVY}), ("Dr. Amitesh Pandey", {}),
+         ("   |   B.Tech, 3rd year, JIIT", {"color": MUTED})],
+    ], size=11, color=INK)
+    for p_ in s.shapes[-1].text_frame.paragraphs:
+        p_.space_after = Pt(4)
 
 
 # ---------------------------------------------------------------- slide 2
